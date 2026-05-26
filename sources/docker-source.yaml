@@ -1,0 +1,18 @@
+name: docker
+description: Query Docker containers, logs, and stats as SQL
+base_url: http://localhost:2375  # or unix:///var/run/docker.sock
+tables:
+  containers:
+    endpoint: /containers/json?all=true
+    columns:
+      - name: container_name
+      - name: status
+      - name: image
+      - name: created
+  logs:
+    endpoint: /containers/{id}/logs?stdout=true&stderr=true×tamps=true
+    columns:
+      - name: container_name
+      - name: log_line
+      - name: log_level
+      - name: timestamp

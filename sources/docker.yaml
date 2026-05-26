@@ -1,0 +1,56 @@
+name: docker
+version: 0.1.0
+dsl_version: 3
+backend: http
+
+inputs:
+  DOCKER_API_BASE:
+    kind: variable
+    default: http://localhost:2375
+    hint: "Base URL for the Docker Engine HTTP API"
+
+base_url: "{{input.DOCKER_API_BASE}}"
+
+test_queries:
+  - SELECT id, status, image FROM docker.containers LIMIT 1
+
+tables:
+  - name: containers
+    description: "All Docker containers including stopped and exited ones"
+    request:
+      method: GET
+      path: /containers/json?all=true
+    response:
+      rows_path: []
+    columns:
+      - name: id
+        type: Utf8
+      - name: image
+        type: Utf8
+      - name: status
+        type: Utf8
+      - name: state
+        type: Utf8
+      - name: created
+        type: Int64
+      - name: command
+        type: Utf8
+
+  - name: running
+    description: "Only currently running containers"
+    request:
+      method: GET
+      path: /containers/json
+    response:
+      rows_path: []
+    columns:
+      - name: id
+        type: Utf8
+      - name: image
+        type: Utf8
+      - name: status
+        type: Utf8
+      - name: state
+        type: Utf8
+      - name: created
+        type: Int64
