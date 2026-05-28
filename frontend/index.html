@@ -3,657 +3,721 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Coral Watchdog 🏴‍☠️</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
+<title>Coral Watchdog — AI DevOps Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;700;800;900&display=swap" rel="stylesheet"/>
 <style>
+/* ── THEME TOKENS ── */
 :root {
-  --bg: #09090b;
-  --bg2: #111113;
-  --bg3: #18181b;
-  --border: #27272a;
-  --border2: #3f3f46;
-  --text: #fafafa;
-  --muted: #71717a;
-  --accent: #22d3ee;
-  --accent2: #a78bfa;
-  --red: #f87171;
-  --green: #4ade80;
-  --yellow: #fbbf24;
-  --glow: 0 0 20px rgba(34,211,238,0.15);
-  --glow-red: 0 0 20px rgba(248,113,113,0.2);
+  --bg:#020408; --bg2:rgba(10,16,30,0.7); --bg3:rgba(20,30,50,0.5);
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
+  --text:#f1f5f9; --muted:#64748b; --muted2:#94a3b8;
+  --card:rgba(255,255,255,0.025); --card-hover:rgba(255,255,255,0.05);
+  --accent:#06b6d4; --accent2:#8b5cf6; --accent3:#ec4899;
+  --green:#10b981; --red:#ef4444; --yellow:#f59e0b;
 }
 [data-theme="light"] {
-  --bg: #fafafa;
-  --bg2: #f4f4f5;
-  --bg3: #e4e4e7;
-  --border: #d4d4d8;
-  --border2: #a1a1aa;
-  --text: #09090b;
-  --muted: #71717a;
-  --glow: 0 0 20px rgba(34,211,238,0.08);
+  --bg:#f8fafc; --bg2:rgba(255,255,255,0.8); --bg3:rgba(241,245,249,0.9);
+  --border:rgba(0,0,0,0.08); --border2:rgba(0,0,0,0.15);
+  --text:#0f172a; --muted:#94a3b8; --muted2:#64748b;
+  --card:rgba(255,255,255,0.9); --card-hover:rgba(255,255,255,1);
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 14px; }
-body {
-  font-family: 'JetBrains Mono', monospace;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-  transition: background 0.3s, color 0.3s;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:14px}
+body{font-family:'JetBrains Mono',monospace;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh;transition:background .4s,color .4s}
+
+/* ── BACKGROUND ── */
+.bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 80% 60% at 15% -10%,rgba(6,182,212,.07),transparent),
+    radial-gradient(ellipse 60% 70% at 85% 110%,rgba(139,92,246,.07),transparent),
+    radial-gradient(ellipse 40% 40% at 50% 50%,rgba(236,72,153,.03),transparent);
+  transition:opacity .4s}
+[data-theme="light"] .bg-mesh{opacity:.4}
+.bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:48px 48px;animation:gridDrift 20s linear infinite;
+  mask-image:radial-gradient(ellipse 100% 100% at center,black 20%,transparent 75%)}
+[data-theme="light"] .bg-grid{background-image:linear-gradient(rgba(0,0,0,.04) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(0,0,0,.04) 1px,transparent 1px)}
+@keyframes gridDrift{to{background-position:0 48px}}
+.bg-cursor{position:fixed;width:700px;height:700px;background:radial-gradient(circle,rgba(6,182,212,.055),transparent 65%);
+  transform:translate(-50%,-50%);pointer-events:none;z-index:0;transition:left .9s ease,top .9s ease}
+[data-theme="light"] .bg-cursor{background:radial-gradient(circle,rgba(6,182,212,.04),transparent 65%)}
+
+/* ── PARTICLES ── */
+.particles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.particle{position:absolute;width:2px;height:2px;background:var(--accent);border-radius:50%;
+  animation:particleDrift linear infinite;opacity:0}
+@keyframes particleDrift{
+  0%{transform:translateY(100vh) translateX(0);opacity:0}
+  10%{opacity:.6}
+  90%{opacity:.3}
+  100%{transform:translateY(-10vh) translateX(var(--drift));opacity:0}}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:66px;
+  display:flex;align-items:center;justify-content:space-between;padding:0 40px;
+  background:transparent;border-bottom:1px solid transparent;
+  transition:background .4s,border-color .4s,backdrop-filter .4s}
+nav.scrolled{background:rgba(2,4,8,.88);backdrop-filter:blur(24px);border-bottom-color:rgba(255,255,255,.06)}
+[data-theme="light"] nav.scrolled{background:rgba(248,250,252,.92)}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:900;font-size:1.12rem;letter-spacing:-.03em;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;display:flex;align-items:center;gap:8px}
+.nav-logo-icon{-webkit-text-fill-color:initial}
+.nav-links{display:flex;gap:4px}
+.nav-link{padding:8px 14px;border-radius:10px;font-size:.75rem;color:var(--muted2);cursor:pointer;
+  transition:color .2s,background .2s;text-transform:uppercase;letter-spacing:.08em;
+  border:none;background:none;font-family:inherit}
+.nav-link:hover{color:var(--text);background:rgba(255,255,255,.05)}
+[data-theme="light"] .nav-link:hover{background:rgba(0,0,0,.05)}
+.nav-link.active{color:var(--accent);background:rgba(6,182,212,.08)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.live-pill{display:flex;align-items:center;gap:6px;padding:5px 13px;border-radius:99px;
+  background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);font-size:.68rem;color:var(--green);letter-spacing:.12em}
+.live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:livePulse 1.5s ease infinite}
+@keyframes livePulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(16,185,129,.5)}50%{opacity:.6;box-shadow:0 0 0 6px rgba(16,185,129,0)}}
+.theme-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--border2);
+  background:var(--card);color:var(--muted2);cursor:pointer;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;transition:border-color .2s,transform .2s}
+.theme-btn:hover{border-color:var(--accent);transform:rotate(20deg)}
+.dash-btn{height:38px;padding:0 18px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;color:#000;font-family:inherit;font-weight:700;font-size:.75rem;
+  cursor:pointer;letter-spacing:.05em;transition:opacity .2s,transform .2s}
+.dash-btn:hover{opacity:.85;transform:translateY(-1px)}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:space-between;
+  gap:60px;padding:120px 80px 80px;position:relative;z-index:5}
+.hero-left{max-width:620px;flex-shrink:0}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:99px;
+  border:1px solid rgba(6,182,212,.3);background:rgba(6,182,212,.06);
+  color:var(--accent);font-size:.7rem;letter-spacing:.14em;margin-bottom:28px;
+  animation:tagGlow 3s ease infinite}
+@keyframes tagGlow{0%,100%{box-shadow:0 0 0 rgba(6,182,212,0)}50%{box-shadow:0 0 28px rgba(6,182,212,.2)}}
+.hero-tag-dot{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:livePulse 1.5s ease infinite}
+.hero h1{font-family:'Syne',sans-serif;font-size:5rem;line-height:.9;letter-spacing:-.05em;margin-bottom:28px}
+.hero h1 .l1{display:block;color:var(--text)}
+.hero h1 .l2{display:block;background:linear-gradient(135deg,var(--accent),var(--accent2) 50%,var(--accent3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradShift 4s ease infinite}
+.hero h1 .l3{display:block;color:var(--muted);font-size:.65em}
+@keyframes gradShift{0%,100%{filter:hue-rotate(0deg)}50%{filter:hue-rotate(15deg)}}
+.hero-desc{color:var(--muted2);font-size:.93rem;line-height:1.95;max-width:510px;margin-bottom:40px}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:52px}
+.cta-p{height:52px;padding:0 28px;border-radius:14px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;color:#000;font-family:inherit;font-weight:700;font-size:.82rem;
+  cursor:pointer;letter-spacing:.06em;box-shadow:0 0 40px rgba(6,182,212,.25);
+  transition:transform .25s,box-shadow .25s}
+.cta-p:hover{transform:translateY(-3px);box-shadow:0 0 70px rgba(6,182,212,.4)}
+.cta-s{height:52px;padding:0 28px;border-radius:14px;background:var(--card);
+  border:1px solid var(--border2);color:var(--text);font-family:inherit;
+  font-weight:600;font-size:.82rem;cursor:pointer;backdrop-filter:blur(10px);
+  transition:border-color .25s,background .25s,transform .25s}
+.cta-s:hover{border-color:rgba(6,182,212,.45);background:rgba(6,182,212,.07);transform:translateY(-3px)}
+.hero-stats{display:flex;gap:40px}
+.hs-val{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;color:var(--accent)}
+.hs-lbl{color:var(--muted);font-size:.68rem;letter-spacing:.1em;margin-top:4px}
+
+/* ── HERO TERMINAL ── */
+.hero-right{flex:0 0 490px;position:relative}
+.hero-glow{position:absolute;inset:-28px;border-radius:40px;
+  background:conic-gradient(from 0deg,var(--accent),var(--accent2),var(--accent3),var(--accent));
+  filter:blur(50px);opacity:.11;animation:ringRot 7s linear infinite}
+@keyframes ringRot{to{transform:rotate(360deg)}}
+.hero-terminal{position:relative;z-index:2;background:rgba(5,10,20,.85);
+  border:1px solid rgba(255,255,255,.09);border-radius:22px;overflow:hidden;
+  backdrop-filter:blur(30px);box-shadow:0 40px 80px rgba(0,0,0,.5);
+  animation:termFloat 6s ease-in-out infinite}
+[data-theme="light"] .hero-terminal{background:rgba(15,23,42,.92)}
+@keyframes termFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.term-bar{height:44px;display:flex;align-items:center;gap:7px;padding:0 16px;
+  background:rgba(255,255,255,.025);border-bottom:1px solid rgba(255,255,255,.05)}
+.td{width:11px;height:11px;border-radius:50%}
+.td:nth-child(1){background:#ef4444}.td:nth-child(2){background:#f59e0b}.td:nth-child(3){background:#10b981}
+.term-title{margin-left:8px;font-size:.7rem;color:var(--muted);letter-spacing:.08em}
+.term-body{padding:20px 22px;font-size:.76rem;line-height:2.1;min-height:260px}
+.t-p{color:var(--muted)}.t-c{color:var(--accent)}.t-ok{color:var(--green)}
+.t-w{color:var(--yellow)}.t-e{color:var(--red);animation:blink 1s ease infinite}
+.t-d{color:var(--muted)}.t-cur{display:inline-block;width:8px;height:14px;
+  background:var(--accent);vertical-align:text-bottom;animation:curBlink 1s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes curBlink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── DASHBOARD ── */
+.page-section{display:none;animation:secIn .4s ease both}
+.page-section.active{display:block}
+@keyframes secIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.dash-wrap{max-width:1280px;margin:0 auto;padding:32px 24px 80px;position:relative;z-index:5}
+.page-hdr{margin-bottom:26px}
+.page-hdr-title{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-.03em}
+.page-hdr-title span{background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.page-hdr-sub{color:var(--muted2);font-size:.8rem;margin-top:6px}
+
+/* ── METRICS ── */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+@media(max-width:900px){.metrics{grid-template-columns:repeat(2,1fr)}}
+.metric-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:24px;
+  position:relative;overflow:hidden;backdrop-filter:blur(20px);
+  transition:border-color .3s,transform .35s,box-shadow .35s;animation:cardIn .5s ease both}
+.metric-card:hover{border-color:rgba(6,182,212,.3);transform:translateY(-5px);box-shadow:0 0 50px rgba(6,182,212,.1)}
+.metric-card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.45}
+.metric-card.danger{border-color:rgba(239,68,68,.2)}
+.metric-card.danger::after{background:linear-gradient(90deg,transparent,var(--red),transparent)}
+.metric-card.danger:hover{border-color:rgba(239,68,68,.45);box-shadow:0 0 40px rgba(239,68,68,.1)}
+.m-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;margin-bottom:10px}
+.m-val{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;line-height:1}
+.m-val.red{color:var(--red)}.m-val.green{color:var(--green)}.m-val.cyan{color:var(--accent)}
+.m-sub{font-size:.7rem;color:var(--muted);margin-top:8px}
+@keyframes cardIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.metric-card:nth-child(1){animation-delay:.05s}.metric-card:nth-child(2){animation-delay:.1s}
+.metric-card:nth-child(3){animation-delay:.15s}.metric-card:nth-child(4){animation-delay:.2s}
+
+/* ── GRID + CARDS ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:860px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;
+  backdrop-filter:blur(20px);transition:border-color .3s,box-shadow .3s;animation:cardIn .4s ease both}
+.card:hover{border-color:var(--border2)}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;
+  padding:15px 20px;border-bottom:1px solid var(--border)}
+.card-hdr-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);
+  display:flex;align-items:center;gap:8px}
+.card-hdr-title .hl{color:var(--accent)}
+.cbadge{font-size:.65rem;padding:3px 10px;border-radius:99px;
+  background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.25);color:var(--accent)}
+
+/* ── CONTAINER ROWS ── */
+.ctr-row{display:flex;align-items:center;gap:12px;padding:13px 20px;
+  border-bottom:1px solid var(--border);transition:background .15s;animation:slideR .3s ease both}
+.ctr-row:last-child{border-bottom:none}
+.ctr-row:hover{background:var(--card-hover)}
+@keyframes slideR{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sdot.ok{background:var(--green);box-shadow:0 0 8px var(--green)}
+.sdot.bad{background:var(--red);box-shadow:0 0 8px var(--red);animation:blink 1s ease infinite}
+.ctr-name{font-weight:600;font-size:.85rem;flex:1}.ctr-img{color:var(--muted);font-size:.72rem}
+.stag{font-size:.68rem;padding:3px 9px;border-radius:99px;border:1px solid;white-space:nowrap}
+.stag.ok{color:var(--green);border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.07)}
+.stag.bad{color:var(--red);border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.07)}
+
+/* ── LOG STREAM ── */
+.log-stream{height:260px;overflow-y:auto;padding:14px 18px;font-size:.72rem;line-height:1.9;
+  background:rgba(0,0,0,.2);transition:background .3s}
+[data-theme="light"] .log-stream{background:rgba(0,0,0,.04)}
+.log-stream::-webkit-scrollbar{width:3px}
+.log-stream::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.log-line{display:flex;gap:10px;animation:logIn .2s ease}
+@keyframes logIn{from{opacity:0;transform:translateX(-5px)}to{opacity:1;transform:translateX(0)}}
+.log-t{color:var(--muted);flex-shrink:0}
+.log-m.ok{color:var(--green)}.log-m.err{color:var(--red)}.log-m.info{color:var(--accent)}.log-m.warn{color:var(--yellow)}
+
+/* ── INCIDENTS ── */
+.inc-item{padding:16px 20px;border-bottom:1px solid var(--border);animation:cardIn .3s ease both}
+.inc-item:last-child{border-bottom:none}
+.inc-item:hover{background:var(--card-hover)}
+.inc-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.inc-name{font-weight:700;color:var(--red);font-size:.85rem}
+.inc-time{color:var(--muted);font-size:.68rem;margin-left:auto}
+.inc-body{color:var(--muted2);font-size:.78rem;line-height:1.65}
+
+/* ── FULL CONTAINERS ── */
+.ctrs-grid{display:grid;gap:10px}
+.cfc{display:flex;align-items:center;gap:16px;padding:18px 22px;
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  backdrop-filter:blur(20px);transition:border-color .3s,box-shadow .3s,transform .25s;animation:cardIn .3s ease both}
+.cfc:hover{border-color:var(--border2);transform:translateX(5px)}
+.cfc.bad{border-color:rgba(239,68,68,.2)}.cfc.bad:hover{border-color:rgba(239,68,68,.45);box-shadow:0 0 30px rgba(239,68,68,.08)}
+.cfc-info{flex:1}.cfc-name{font-weight:700;font-size:.9rem}.cfc-img{color:var(--muted);font-size:.75rem;margin-top:3px}
+.cfc-cpu{font-size:.8rem;color:var(--accent)}
+
+/* ── NL QUERY ── */
+.nl-card{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;
+  backdrop-filter:blur(20px);position:relative;margin-bottom:20px;animation:cardIn .4s ease both}
+.nl-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent),var(--accent2),transparent)}
+.nl-hdr{padding:15px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.nl-hdr-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.ai-badge{font-size:.65rem;padding:3px 10px;border-radius:99px;
+  background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);color:var(--accent2)}
+.nl-input-row{display:flex}
+.nl-prefix{display:flex;align-items:center;padding:0 16px;
+  background:rgba(6,182,212,.06);border-right:1px solid var(--border);color:var(--accent);font-size:.9rem;flex-shrink:0}
+#nl-input{flex:1;background:transparent;border:none;outline:none;padding:18px 20px;
+  font-family:inherit;font-size:.88rem;color:var(--text);caret-color:var(--accent)}
+#nl-input::placeholder{color:var(--muted)}
+.nl-run{padding:0 24px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;color:#000;font-family:inherit;font-weight:700;font-size:.78rem;
+  cursor:pointer;letter-spacing:.08em;text-transform:uppercase;transition:opacity .2s}
+.nl-run:hover{opacity:.85}.nl-run:disabled{opacity:.35;cursor:not-allowed}
+.nl-chips{padding:10px 20px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap}
+.chip{font-size:.7rem;padding:4px 12px;border-radius:99px;background:var(--card);
+  border:1px solid var(--border);color:var(--muted2);cursor:pointer;transition:border-color .2s,color .2s}
+.chip:hover{border-color:rgba(6,182,212,.4);color:var(--accent)}
+.nl-result{border-top:1px solid var(--border);display:none}
+.nl-result.show{display:block}
+.nl-sql{padding:14px 20px;background:rgba(0,0,0,.15);border-bottom:1px solid var(--border)}
+[data-theme="light"] .nl-sql{background:rgba(0,0,0,.04)}
+.nl-sql-lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px}
+.nl-sql-code{font-size:.78rem;color:var(--text)}
+.nl-tbl-wrap{overflow-x:auto}
+.nl-tbl{width:100%;border-collapse:collapse;font-size:.78rem}
+.nl-tbl th{text-align:left;padding:10px 16px;background:rgba(255,255,255,.03);
+  color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;
+  border-bottom:1px solid var(--border)}
+[data-theme="light"] .nl-tbl th{background:rgba(0,0,0,.03)}
+.nl-tbl td{padding:11px 16px;border-bottom:1px solid var(--border);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nl-tbl tr:last-child td{border-bottom:none}
+.nl-tbl tr:hover td{background:var(--card-hover)}
+.nl-err{padding:14px 20px;color:var(--red);font-size:.8rem;background:rgba(239,68,68,.05);border-top:1px solid rgba(239,68,68,.15)}
+.empty-state{padding:48px;text-align:center;color:var(--muted);font-size:.8rem}
+.empty-icon{font-size:2.4rem;margin-bottom:12px}
+
+/* ── SQL EXAMPLES ── */
+.sql-examples{display:grid;gap:12px}
+.sql-ex{background:var(--card);border:1px solid var(--border);border-radius:14px;
+  overflow:hidden;backdrop-filter:blur(20px);animation:cardIn .3s ease both}
+.sql-ex-hdr{padding:11px 18px;border-bottom:1px solid var(--border);font-size:.7rem;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--muted);
+  display:flex;align-items:center;justify-content:space-between}
+.sql-run-btn{font-size:.68rem;padding:4px 10px;border-radius:6px;
+  background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.3);
+  color:var(--accent);cursor:pointer;font-family:inherit;transition:background .2s}
+.sql-run-btn:hover{background:rgba(6,182,212,.22)}
+.sql-ex-body{padding:16px 18px;font-size:.76rem;line-height:1.8;background:rgba(0,0,0,.12)}
+[data-theme="light"] .sql-ex-body{background:rgba(0,0,0,.03)}
+.kw{color:var(--accent2);font-weight:600}.tbl{color:var(--accent)}.str{color:var(--yellow)}.num{color:var(--green)}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:28px;right:28px;z-index:999;
+  background:rgba(10,16,30,.95);border:1px solid var(--border2);
+  border-radius:14px;padding:14px 20px;font-size:.8rem;
+  backdrop-filter:blur(20px);max-width:320px;
+  opacity:0;transform:translateY(8px);transition:opacity .3s,transform .3s;pointer-events:none}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.danger{border-color:rgba(239,68,68,.35);background:rgba(25,5,5,.95)}
+[data-theme="light"] #toast{background:rgba(255,255,255,.97)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){
+  .hero{flex-direction:column;padding:100px 24px 60px;text-align:center}
+  .hero h1{font-size:3.8rem}.hero-right{width:100%;max-width:520px}
+  .hero-ctas{justify-content:center}.hero-stats{justify-content:center}
 }
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(34,211,238,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(34,211,238,0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events: none;
-  z-index: 0;
-}
-[data-theme="light"] body::before {
-  background-image:
-    linear-gradient(rgba(34,211,238,0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(34,211,238,0.06) 1px, transparent 1px);
-}
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.015) 2px,rgba(0,0,0,0.015) 4px);
-  pointer-events: none;
-  z-index: 1;
-}
-nav {
-  position: sticky; top: 0; z-index: 100;
-  display: flex; align-items: center; gap: 0;
-  padding: 0 24px;
-  height: 56px;
-  background: rgba(9,9,11,0.85);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-}
-[data-theme="light"] nav { background: rgba(250,250,250,0.85); }
-.nav-logo {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 1.1rem;
-  letter-spacing: -0.02em;
-  color: var(--accent);
-  text-shadow: 0 0 20px rgba(34,211,238,0.5);
-  margin-right: 32px;
-  white-space: nowrap;
-}
-.nav-logo span { color: var(--text); }
-.nav-tabs { display: flex; gap: 0; flex: 1; }
-.nav-tab {
-  padding: 0 16px;
-  height: 56px;
-  display: flex; align-items: center;
-  font-size: 0.8rem;
-  color: var(--muted);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: color 0.2s, border-color 0.2s;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  user-select: none;
-}
-.nav-tab:hover { color: var(--text); }
-.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-.nav-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
-.live-badge {
-  display: flex; align-items: center; gap: 6px;
-  padding: 4px 10px;
-  background: rgba(74,222,128,0.1);
-  border: 1px solid rgba(74,222,128,0.3);
-  border-radius: 99px;
-  font-size: 0.7rem;
-  color: var(--green);
-  letter-spacing: 0.1em;
-}
-.live-dot {
-  width: 6px; height: 6px;
-  background: var(--green);
-  border-radius: 50%;
-  animation: pulse 1.5s ease-in-out infinite;
-}
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
-.theme-btn {
-  width: 36px; height: 36px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg2);
-  color: var(--muted);
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1rem;
-  transition: border-color 0.2s, color 0.2s;
-}
-.theme-btn:hover { border-color: var(--accent); color: var(--accent); }
-main { max-width: 1280px; margin: 0 auto; padding: 24px; position: relative; z-index: 2; }
-.section { display: none; }
-.section.active { display: block; }
-.page-header { margin-bottom: 24px; animation: fadeUp 0.5s ease both; }
-.page-title { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em; }
-.page-title span { color: var(--accent); }
-.page-sub { color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
-.metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
-@media(max-width:768px) { .metrics { grid-template-columns: repeat(2,1fr); } }
-.metric-card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px;
-  position: relative;
-  overflow: hidden;
-  animation: fadeUp 0.5s ease both;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.metric-card:hover { border-color: var(--border2); box-shadow: var(--glow); }
-.metric-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--accent), transparent);
-  opacity: 0.6;
-}
-.metric-card.alert::before { background: linear-gradient(90deg, var(--red), transparent); }
-.metric-card.alert { border-color: rgba(248,113,113,0.3); }
-.metric-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px; }
-.metric-value { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--text); line-height: 1; }
-.metric-value.red { color: var(--red); }
-.metric-value.green { color: var(--green); }
-.metric-sub { font-size: 0.7rem; color: var(--muted); margin-top: 6px; }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-@media(max-width:900px) { .grid-2 { grid-template-columns: 1fr; } }
-.card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; animation: fadeUp 0.5s ease both; transition: border-color 0.2s; }
-.card:hover { border-color: var(--border2); }
-.card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); }
-.card-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); display: flex; align-items: center; gap: 8px; }
-.card-title-accent { color: var(--accent); }
-.card-body { padding: 0; }
-.container-row { display: flex; align-items: center; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--border); transition: background 0.15s; animation: slideIn 0.3s ease both; }
-.container-row:last-child { border-bottom: none; }
-.container-row:hover { background: var(--bg3); }
-.status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.status-dot.healthy { background: var(--green); box-shadow: 0 0 8px var(--green); }
-.status-dot.unhealthy { background: var(--red); box-shadow: 0 0 8px var(--red); animation: blink 1s ease infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-.container-name { font-weight: 600; font-size: 0.85rem; flex: 1; }
-.container-image { color: var(--muted); font-size: 0.75rem; }
-.container-status { font-size: 0.7rem; padding: 3px 8px; border-radius: 99px; border: 1px solid; }
-.container-status.healthy { color: var(--green); border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.08); }
-.container-status.unhealthy { color: var(--red); border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.08); }
-.log-stream { height: 240px; overflow-y: auto; padding: 12px; font-size: 0.72rem; line-height: 1.8; background: var(--bg); border-top: 1px solid var(--border); }
-.log-stream::-webkit-scrollbar { width: 4px; }
-.log-stream::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-.log-line { display: flex; gap: 10px; animation: fadeIn 0.2s ease; }
-.log-time { color: var(--muted); flex-shrink: 0; }
-.log-msg.ok { color: var(--green); }
-.log-msg.err { color: var(--red); }
-.log-msg.info { color: var(--accent); }
-.log-msg.warn { color: var(--yellow); }
-.incident-item { padding: 14px 18px; border-bottom: 1px solid var(--border); animation: slideIn 0.3s ease both; }
-.incident-item:last-child { border-bottom: none; }
-.incident-top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-.incident-container { font-weight: 600; color: var(--red); font-size: 0.85rem; }
-.incident-time { color: var(--muted); font-size: 0.7rem; margin-left: auto; }
-.incident-summary { color: var(--muted); font-size: 0.78rem; line-height: 1.6; }
-.containers-grid { display: grid; gap: 10px; }
-.container-full-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; transition: border-color 0.2s, box-shadow 0.2s; animation: fadeUp 0.3s ease both; }
-.container-full-card:hover { border-color: var(--border2); box-shadow: var(--glow); }
-.container-full-card.unhealthy { border-color: rgba(248,113,113,0.3); box-shadow: var(--glow-red); }
-.cfc-name { font-weight: 600; font-size: 0.9rem; }
-.cfc-image { color: var(--muted); font-size: 0.75rem; margin-top: 2px; }
-.cfc-cpu { font-size: 0.8rem; color: var(--accent); margin-left: auto; }
-.cfc-status-badge { font-size: 0.72rem; padding: 4px 10px; border-radius: 99px; border: 1px solid; white-space: nowrap; }
-.cfc-status-badge.healthy { color: var(--green); border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.06); }
-.cfc-status-badge.unhealthy { color: var(--red); border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.06); }
-.empty-state { padding: 40px; text-align: center; color: var(--muted); font-size: 0.8rem; }
-.empty-state-icon { font-size: 2rem; margin-bottom: 10px; }
-/* NL QUERY */
-.nl-section { margin-bottom: 24px; }
-.nl-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; animation: fadeUp 0.5s ease both; position: relative; }
-.nl-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
-.nl-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
-.nl-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
-.ai-badge { font-size: 0.65rem; padding: 2px 8px; background: rgba(167,139,250,0.15); border: 1px solid rgba(167,139,250,0.3); border-radius: 99px; color: var(--accent2); letter-spacing: 0.08em; }
-.nl-input-row { display: flex; align-items: stretch; gap: 0; }
-.prompt-prefix { display: flex; align-items: center; padding: 0 14px; background: var(--bg); border-right: 1px solid var(--border); color: var(--accent); font-size: 0.85rem; flex-shrink: 0; }
-#nl-input { flex: 1; background: var(--bg2); border: none; outline: none; padding: 16px 18px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text); caret-color: var(--accent); }
-#nl-input::placeholder { color: var(--muted); }
-#nl-input:focus { background: var(--bg3); }
-.nl-btn { padding: 0 20px; background: var(--accent); border: none; color: #000; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.08em; transition: opacity 0.2s, background 0.2s; white-space: nowrap; }
-.nl-btn:hover { opacity: 0.85; }
-.nl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.nl-btn.loading { background: var(--accent2); }
-.nl-examples { padding: 10px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap; }
-.example-chip { font-size: 0.7rem; padding: 4px 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: 99px; color: var(--muted); cursor: pointer; transition: border-color 0.2s, color 0.2s; }
-.example-chip:hover { border-color: var(--accent); color: var(--accent); }
-.nl-result { border-top: 1px solid var(--border); display: none; }
-.nl-result.visible { display: block; }
-.generated-sql { padding: 12px 18px; background: var(--bg); border-bottom: 1px solid var(--border); font-size: 0.75rem; color: var(--muted); }
-.generated-sql-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 6px; }
-.generated-sql-code { color: var(--text); }
-.nl-table-wrap { overflow-x: auto; }
-.nl-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
-.nl-table th { text-align: left; padding: 8px 14px; background: var(--bg3); color: var(--muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid var(--border); }
-.nl-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text); font-size: 0.78rem; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.nl-table tr:last-child td { border-bottom: none; }
-.nl-table tr:hover td { background: var(--bg3); }
-.nl-error { padding: 14px 18px; color: var(--red); font-size: 0.8rem; background: rgba(248,113,113,0.05); border-top: 1px solid rgba(248,113,113,0.2); }
-.sql-examples { display: grid; gap: 10px; margin-bottom: 20px; }
-.sql-example-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; animation: fadeUp 0.3s ease both; }
-.sql-example-label { padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); display: flex; align-items: center; justify-content: space-between; }
-.sql-run-btn { font-size: 0.65rem; padding: 3px 8px; background: rgba(34,211,238,0.1); border: 1px solid rgba(34,211,238,0.3); border-radius: 4px; color: var(--accent); cursor: pointer; transition: background 0.2s; font-family: 'JetBrains Mono', monospace; }
-.sql-run-btn:hover { background: rgba(34,211,238,0.2); }
-.sql-example-code { padding: 14px 16px; font-size: 0.75rem; line-height: 1.7; background: var(--bg); }
-.sql-kw { color: var(--accent2); font-weight: 600; }
-.sql-tbl { color: var(--accent); }
-.sql-str { color: var(--yellow); }
-.sql-num { color: var(--green); }
-@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-@keyframes fadeIn { from{opacity:0} to{opacity:1} }
-@keyframes slideIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
-.metrics .metric-card:nth-child(1){animation-delay:.05s}
-.metrics .metric-card:nth-child(2){animation-delay:.1s}
-.metrics .metric-card:nth-child(3){animation-delay:.15s}
-.metrics .metric-card:nth-child(4){animation-delay:.2s}
-#toast { position:fixed; bottom:24px; right:24px; background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:12px 18px; font-size:0.8rem; color:var(--text); z-index:1000; max-width:300px; opacity:0; transform:translateY(10px); transition:opacity 0.3s,transform 0.3s; pointer-events:none; }
-#toast.show { opacity:1; transform:translateY(0); }
-#toast.alert { border-color:rgba(248,113,113,0.4); background:rgba(248,113,113,0.1); }
+@media(max-width:640px){.hero h1{font-size:2.8rem}nav{padding:0 18px}}
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="nav-logo">🪸 Coral<span>Watchdog</span></div>
-  <div class="nav-tabs">
-    <div class="nav-tab active" onclick="showSection('overview',this)">Overview</div>
-    <div class="nav-tab" onclick="showSection('containers',this)">Containers</div>
-    <div class="nav-tab" onclick="showSection('incidents',this)">Incidents</div>
-    <div class="nav-tab" onclick="showSection('query',this)">Query</div>
+<div class="bg-mesh"></div>
+<div class="bg-grid"></div>
+<div class="bg-cursor" id="bgcursor"></div>
+<div class="particles" id="particles"></div>
+
+<!-- ── NAV ── -->
+<nav id="nav">
+  <div class="nav-logo"><span class="nav-logo-icon">🪸</span>CoralWatchdog</div>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="goTo('overview',this)">Overview</button>
+    <button class="nav-link" onclick="goTo('containers',this)">Containers</button>
+    <button class="nav-link" onclick="goTo('incidents',this)">Incidents</button>
+    <button class="nav-link" onclick="goTo('query',this)">Query</button>
   </div>
   <div class="nav-right">
-    <div class="live-badge"><div class="live-dot"></div>LIVE</div>
-    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+    <div class="live-pill"><div class="live-dot"></div>LIVE</div>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+    <button class="dash-btn" onclick="openDash()">Dashboard →</button>
   </div>
 </nav>
 
-<main>
+<!-- ── HERO ── -->
+<section class="hero" id="hero">
+  <div class="hero-left">
+    <div class="hero-tag"><div class="hero-tag-dot"></div>PIRATES OF THE CORAL-BEAN · 2026</div>
+    <h1>
+      <span class="l1">Autonomous</span>
+      <span class="l2">DevOps</span>
+      <span class="l3">Intelligence</span>
+    </h1>
+    <p class="hero-desc">Real-time incident detection across Docker, GitHub &amp; Slack — joined in a single Coral SQL query. AI-powered root cause analysis via <strong>gpt-4o-mini</strong>. Zero context switching.</p>
+    <div class="hero-ctas">
+      <button class="cta-p" onclick="openDash()">Launch Dashboard →</button>
+      <button class="cta-s" onclick="goTo('query',document.querySelectorAll('.nav-link')[3]);openDash()">Try NL Query</button>
+    </div>
+    <div class="hero-stats">
+      <div><div class="hs-val" id="hs-ctr">—</div><div class="hs-lbl">CONTAINERS</div></div>
+      <div><div class="hs-val" id="hs-inc">0</div><div class="hs-lbl">INCIDENTS</div></div>
+      <div><div class="hs-val" style="color:var(--green)">3</div><div class="hs-lbl">SOURCES</div></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-glow"></div>
+    <div class="hero-terminal">
+      <div class="term-bar">
+        <div class="td"></div><div class="td"></div><div class="td"></div>
+        <span class="term-title">coral-watchdog · agent · v1.0</span>
+      </div>
+      <div class="term-body" id="term-body">
+        <div><span class="t-p">$ </span><span class="t-c">go run main.go</span></div>
+        <div class="t-ok">✓ Docker source connected (2 tables)</div>
+        <div class="t-ok">✓ GitHub source connected (362 tables)</div>
+        <div class="t-ok">✓ Slack source connected</div>
+        <div class="t-d">🌐 Dashboard → http://localhost:8080</div>
+        <div id="term-live"><span class="t-cur"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
 
-<!-- OVERVIEW -->
-<div class="section active" id="section-overview">
-  <div class="page-header">
-    <div class="page-title">Infrastructure <span>Overview</span></div>
-    <div class="page-sub">Real-time monitoring via Docker + GitHub + Slack · Powered by Coral SQL</div>
-  </div>
-  <div class="metrics">
-    <div class="metric-card">
-      <div class="metric-label">Total Containers</div>
-      <div class="metric-value" id="m-total">—</div>
-      <div class="metric-sub">Across all states</div>
-    </div>
-    <div class="metric-card alert" id="mc-unhealthy">
-      <div class="metric-label">Unhealthy</div>
-      <div class="metric-value red" id="m-unhealthy">—</div>
-      <div class="metric-sub">Require attention</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-label">Incidents (24h)</div>
-      <div class="metric-value" id="m-incidents">0</div>
-      <div class="metric-sub">AI-analyzed</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-label">Coral Sources</div>
-      <div class="metric-value green">3</div>
-      <div class="metric-sub">Docker · GitHub · Slack</div>
-    </div>
-  </div>
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">🐳 <span class="card-title-accent">docker</span>.containers</div>
-        <div style="font-size:0.7rem;color:var(--muted)" id="container-count-label">—</div>
-      </div>
-      <div class="card-body" id="container-list">
-        <div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">📡 <span class="card-title-accent">Live</span> Log Stream</div>
-      </div>
-      <div class="log-stream" id="log-stream">
-        <div class="log-line"><span class="log-time">--:--:--</span><span class="log-msg info">Coral Watchdog initialising...</span></div>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-header">
-      <div class="card-title">🚨 <span class="card-title-accent">Recent</span> Incidents</div>
-    </div>
-    <div class="card-body" id="incident-list">
-      <div class="empty-state"><div class="empty-state-icon">✅</div>No incidents — all clear</div>
-    </div>
-  </div>
-</div>
+<!-- ── DASHBOARD ── -->
+<div id="dashboard" style="display:none">
+  <div class="dash-wrap">
 
-<!-- CONTAINERS -->
-<div class="section" id="section-containers">
-  <div class="page-header">
-    <div class="page-title"><span>Container</span> Fleet</div>
-    <div class="page-sub" id="containers-sub">Loading Docker state…</div>
-  </div>
-  <div class="containers-grid" id="containers-full"></div>
-</div>
-
-<!-- INCIDENTS -->
-<div class="section" id="section-incidents">
-  <div class="page-header">
-    <div class="page-title"><span>Incident</span> Feed</div>
-    <div class="page-sub">AI root-cause summaries · Notified via Slack</div>
-  </div>
-  <div class="card">
-    <div class="card-body" id="incidents-full">
-      <div class="empty-state"><div class="empty-state-icon">✅</div>No incidents yet — looking good!</div>
-    </div>
-  </div>
-</div>
-
-<!-- QUERY -->
-<div class="section" id="section-query">
-  <div class="page-header">
-    <div class="page-title">Natural Language <span>Query</span></div>
-    <div class="page-sub">Ask anything about your infra → Coral SQL → Results</div>
-  </div>
-  <div class="nl-section">
-    <div class="nl-card">
-      <div class="nl-header">
-        <div class="nl-title">🪸 Coral Query Interface</div>
-        <div class="ai-badge">AI · gpt-4o-mini NL→SQL</div>
+    <!-- OVERVIEW -->
+    <div class="page-section active" id="sec-overview">
+      <div class="page-hdr">
+        <div class="page-hdr-title">Infrastructure <span>Overview</span></div>
+        <div class="page-hdr-sub">Docker + GitHub + Slack · Coral SQL · Auto-refresh 30s</div>
       </div>
-      <div class="nl-input-row">
-        <div class="prompt-prefix">❯</div>
-        <input id="nl-input" type="text" placeholder="which containers are unhealthy right now?" autocomplete="off"/>
-        <button class="nl-btn" id="nl-btn" onclick="runNLQuery()">RUN</button>
+      <div class="metrics">
+        <div class="metric-card"><div class="m-label">Total Containers</div><div class="m-val cyan" id="m-total">—</div><div class="m-sub">All states</div></div>
+        <div class="metric-card danger"><div class="m-label">Unhealthy</div><div class="m-val red" id="m-unhealthy">—</div><div class="m-sub">Need attention</div></div>
+        <div class="metric-card"><div class="m-label">Incidents</div><div class="m-val" id="m-incidents">0</div><div class="m-sub">AI-analyzed</div></div>
+        <div class="metric-card"><div class="m-label">Coral Sources</div><div class="m-val green">3</div><div class="m-sub">Docker · GitHub · Slack</div></div>
       </div>
-      <div class="nl-examples">
-        <span class="example-chip" onclick="fillExample(this)">show all containers</span>
-        <span class="example-chip" onclick="fillExample(this)">list recent pull requests</span>
-        <span class="example-chip" onclick="fillExample(this)">which containers are exited?</span>
-        <span class="example-chip" onclick="fillExample(this)">show open PRs from github</span>
-      </div>
-      <div class="nl-result" id="nl-result">
-        <div class="generated-sql" id="nl-sql-display">
-          <div class="generated-sql-label">Generated Coral SQL</div>
-          <div class="generated-sql-code" id="nl-sql-code"></div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-hdr"><div class="card-hdr-title">🐳 <span class="hl">docker</span>.containers</div><div class="cbadge" id="ctr-badge">—</div></div>
+          <div id="ctr-mini"><div class="empty-state"><div class="empty-icon">⏳</div>Connecting…</div></div>
         </div>
-        <div class="nl-table-wrap">
-          <table class="nl-table" id="nl-table">
-            <thead id="nl-thead"></thead>
-            <tbody id="nl-tbody"></tbody>
-          </table>
+        <div class="card">
+          <div class="card-hdr"><div class="card-hdr-title">📡 <span class="hl">Live</span> Event Stream</div></div>
+          <div class="log-stream" id="log-stream">
+            <div class="log-line"><span class="log-t">--:--:--</span><span class="log-m info">Coral Watchdog initialising…</span></div>
+          </div>
         </div>
-        <div class="nl-error" id="nl-error" style="display:none"></div>
       </div>
-    </div>
-  </div>
-
-  <div class="page-header" style="margin-top:8px">
-    <div class="page-title" style="font-size:1.1rem">Cross-Source <span>SQL Examples</span></div>
-  </div>
-  <div class="sql-examples">
-
-    <!-- FIXED: quoted docker column names -->
-    <div class="sql-example-card">
-      <div class="sql-example-label">Incident Analysis — Docker + GitHub JOIN<button class="sql-run-btn" onclick="runSQLExample(this)">▶ RUN</button></div>
-      <div class="sql-example-code">
-        <span class="sql-kw">SELECT</span> dc."Image", dc."Status", gp.title <span class="sql-kw">AS</span> last_pr, gp.user__login <span class="sql-kw">AS</span> author<br>
-        <span class="sql-kw">FROM</span> <span class="sql-tbl">docker.containers</span> dc<br>
-        <span class="sql-kw">LEFT JOIN</span> <span class="sql-tbl">github.pulls</span> gp<br>
-        &nbsp;&nbsp;<span class="sql-kw">ON</span> gp.owner = <span class="sql-str">'ghosthouse7'</span> <span class="sql-kw">AND</span> gp.repo = <span class="sql-str">'CORAL-WATCHDOG'</span><br>
-        <span class="sql-kw">WHERE</span> dc."State" != <span class="sql-str">'running'</span><br>
-        <span class="sql-kw">LIMIT</span> <span class="sql-num">10</span>
+      <div class="card">
+        <div class="card-hdr"><div class="card-hdr-title">🚨 <span class="hl">Recent</span> Incidents</div></div>
+        <div id="inc-mini"><div class="empty-state"><div class="empty-icon">✅</div>No incidents — all clear</div></div>
       </div>
     </div>
 
-    <!-- FIXED: quoted docker column names -->
-    <div class="sql-example-card">
-      <div class="sql-example-label">Container Fleet Status<button class="sql-run-btn" onclick="runSQLExample(this)">▶ RUN</button></div>
-      <div class="sql-example-code">
-        <span class="sql-kw">SELECT</span> "Id", "Image", "Status", "State", "Created"<br>
-        <span class="sql-kw">FROM</span> <span class="sql-tbl">docker.containers</span><br>
-        <span class="sql-kw">ORDER BY</span> "Created" <span class="sql-kw">DESC</span><br>
-        <span class="sql-kw">LIMIT</span> <span class="sql-num">20</span>
+    <!-- CONTAINERS -->
+    <div class="page-section" id="sec-containers">
+      <div class="page-hdr">
+        <div class="page-hdr-title"><span>Container</span> Fleet</div>
+        <div class="page-hdr-sub" id="fleet-sub">Loading…</div>
       </div>
+      <div class="ctrs-grid" id="ctrs-full"></div>
     </div>
 
-    <!-- GitHub only — no docker columns, no change needed -->
-    <div class="sql-example-card">
-      <div class="sql-example-label">Recent GitHub Pull Requests<button class="sql-run-btn" onclick="runSQLExample(this)">▶ RUN</button></div>
-      <div class="sql-example-code">
-        <span class="sql-kw">SELECT</span> title, state, user__login, merged_at<br>
-        <span class="sql-kw">FROM</span> <span class="sql-tbl">github.pulls</span><br>
-        <span class="sql-kw">WHERE</span> owner = <span class="sql-str">'ghosthouse7'</span> <span class="sql-kw">AND</span> repo = <span class="sql-str">'CORAL-WATCHDOG'</span><br>
-        <span class="sql-kw">LIMIT</span> <span class="sql-num">10</span>
+    <!-- INCIDENTS -->
+    <div class="page-section" id="sec-incidents">
+      <div class="page-hdr">
+        <div class="page-hdr-title"><span>Incident</span> Feed</div>
+        <div class="page-hdr-sub">AI root-cause summaries via gpt-4o-mini · Notified via Slack</div>
+      </div>
+      <div class="card"><div id="inc-full"><div class="empty-state"><div class="empty-icon">✅</div>No incidents yet</div></div></div>
+    </div>
+
+    <!-- QUERY -->
+    <div class="page-section" id="sec-query">
+      <div class="page-hdr">
+        <div class="page-hdr-title">Natural Language <span>Query</span></div>
+        <div class="page-hdr-sub">Plain English → Coral SQL → Live Results via gpt-4o-mini</div>
+      </div>
+      <div class="nl-card">
+        <div class="nl-hdr">
+          <div class="nl-hdr-title">🪸 Coral Query Interface</div>
+          <div class="ai-badge">gpt-4o-mini · NL→SQL</div>
+        </div>
+        <div class="nl-input-row">
+          <div class="nl-prefix">❯</div>
+          <input id="nl-input" type="text" placeholder="show all containers" autocomplete="off"/>
+          <button class="nl-run" id="nl-btn" onclick="runNL()">RUN</button>
+        </div>
+        <div class="nl-chips">
+          <span class="chip" onclick="fillQ(this)">show all containers</span>
+          <span class="chip" onclick="fillQ(this)">which containers are exited</span>
+          <span class="chip" onclick="fillQ(this)">list recent pull requests</span>
+          <span class="chip" onclick="fillQ(this)">show open PRs</span>
+          <span class="chip" onclick="fillQ(this)">list slack channels</span>
+        </div>
+        <div class="nl-result" id="nl-result">
+          <div class="nl-sql"><div class="nl-sql-lbl">Generated Coral SQL</div><div class="nl-sql-code" id="nl-sql-code"></div></div>
+          <div class="nl-tbl-wrap"><table class="nl-tbl"><thead id="nl-thead"></thead><tbody id="nl-tbody"></tbody></table></div>
+          <div class="nl-err" id="nl-err" style="display:none"></div>
+        </div>
+      </div>
+      <div class="page-hdr" style="margin-top:6px">
+        <div class="page-hdr-title" style="font-size:1.2rem">Cross-Source <span>SQL Examples</span></div>
+      </div>
+      <div class="sql-examples">
+        <div class="sql-ex">
+          <div class="sql-ex-hdr">Incident Analysis — Docker + GitHub JOIN<button class="sql-run-btn" onclick="runEx(this)">▶ RUN</button></div>
+          <div class="sql-ex-body"><span class="kw">SELECT</span> dc.image, dc.status, gp.title <span class="kw">AS</span> last_pr, gp.user__login <span class="kw">AS</span> author<br><span class="kw">FROM</span> <span class="tbl">docker.containers</span> dc<br><span class="kw">LEFT JOIN</span> <span class="tbl">github.pulls</span> gp <span class="kw">ON</span> gp.owner = <span class="str">'ghosthouse7'</span> <span class="kw">AND</span> gp.repo = <span class="str">'CORAL-WATCHDOG'</span><br><span class="kw">WHERE</span> dc.state != <span class="str">'running'</span> <span class="kw">LIMIT</span> <span class="num">10</span></div>
+        </div>
+        <div class="sql-ex">
+          <div class="sql-ex-hdr">Container Fleet Status<button class="sql-run-btn" onclick="runEx(this)">▶ RUN</button></div>
+          <div class="sql-ex-body"><span class="kw">SELECT</span> id, image, status, state, created <span class="kw">FROM</span> <span class="tbl">docker.containers</span> <span class="kw">ORDER BY</span> created <span class="kw">DESC LIMIT</span> <span class="num">20</span></div>
+        </div>
+        <div class="sql-ex">
+          <div class="sql-ex-hdr">Recent GitHub Pull Requests<button class="sql-run-btn" onclick="runEx(this)">▶ RUN</button></div>
+          <div class="sql-ex-body"><span class="kw">SELECT</span> title, state, user__login, merged_at <span class="kw">FROM</span> <span class="tbl">github.pulls</span><br><span class="kw">WHERE</span> owner = <span class="str">'ghosthouse7'</span> <span class="kw">AND</span> repo = <span class="str">'CORAL-WATCHDOG'</span> <span class="kw">LIMIT</span> <span class="num">10</span></div>
+        </div>
       </div>
     </div>
 
   </div>
 </div>
 
-</main>
 <div id="toast"></div>
 
 <script>
 const API = '';
-let containers = [], incidents = [], incidentCount = 0;
-const logStream = document.getElementById('log-stream');
+let ctrs=[], incs=[], incCount=0;
+const logEl = document.getElementById('log-stream');
 
-function showSection(id, tab) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('section-' + id).classList.add('active');
-  if (tab) tab.classList.add('active');
-}
-
-function toggleTheme() {
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
-  localStorage.setItem('theme', isDark ? 'light' : 'dark');
-}
-
-function showToast(msg, isAlert=false) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'show' + (isAlert ? ' alert' : '');
-  setTimeout(() => t.className = '', 3500);
-}
-
-function addLog(msg, type='info') {
-  const now = new Date().toTimeString().slice(0,8);
-  const line = document.createElement('div');
-  line.className = 'log-line';
-  line.innerHTML = `<span class="log-time">${now}</span><span class="log-msg ${type}">${msg}</span>`;
-  logStream.appendChild(line);
-  logStream.scrollTop = logStream.scrollHeight;
-  if (logStream.children.length > 80) logStream.removeChild(logStream.children[0]);
-}
-
-function counter(el, target, duration=800) {
-  const start = performance.now(), from = parseInt(el.textContent)||0;
-  function tick(now) {
-    const p = Math.min((now-start)/duration, 1);
-    el.textContent = Math.round(from + (target-from)*p);
-    if (p < 1) requestAnimationFrame(tick);
+/* ── PARTICLES ── */
+(function(){
+  const container = document.getElementById('particles');
+  for(let i=0;i<28;i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.cssText = `left:${Math.random()*100}%;--drift:${(Math.random()-0.5)*200}px;
+      animation-duration:${8+Math.random()*14}s;animation-delay:${Math.random()*12}s;
+      opacity:${0.2+Math.random()*0.5}`;
+    container.appendChild(p);
   }
+})();
+
+/* ── CURSOR ── */
+document.addEventListener('mousemove',e=>{
+  const c=document.getElementById('bgcursor');
+  c.style.left=e.clientX+'px';c.style.top=e.clientY+'px';
+});
+
+/* ── NAV SCROLL ── */
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('scrolled',window.scrollY>50);
+});
+
+/* ── THEME ── */
+function toggleTheme(){
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',isDark?'light':'dark');
+  document.getElementById('themeBtn').textContent=isDark?'☀️':'🌙';
+  localStorage.setItem('theme',isDark?'light':'dark');
+}
+(function(){
+  const t=localStorage.getItem('theme')||'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  document.getElementById('themeBtn').textContent=t==='dark'?'🌙':'☀️';
+})();
+
+/* ── HERO TERMINAL ANIMATION ── */
+const termLines=[
+  {cls:'t-w',txt:'⚠  Unhealthy container: jaeger (Exited 255)'},
+  {cls:'t-d',txt:'🪸  Running Coral cross-source SQL...'},
+  {cls:'t-d',txt:'   SELECT dc.image, gp.title FROM docker.containers dc'},
+  {cls:'t-d',txt:'   LEFT JOIN github.pulls gp ON gp.owner=...'},
+  {cls:'t-ok',txt:'✓  Query returned 1 row in 312ms'},
+  {cls:'t-d',txt:'🤖 Calling gpt-4o-mini for root cause analysis...'},
+  {cls:'t-ok',txt:'✓  Summary generated (312 tokens)'},
+  {cls:'t-ok',txt:'✓  Slack alert → #incidents'},
+  {cls:'t-d',txt:'👁  Watching every 60s...'},
+];
+let tli=0;
+setInterval(()=>{
+  const body=document.getElementById('term-body');
+  const live=document.getElementById('term-live');
+  const d=document.createElement('div');
+  d.className=termLines[tli%termLines.length].cls;
+  d.textContent=termLines[tli%termLines.length].txt;
+  body.insertBefore(d,live);
+  if(body.children.length>16)body.removeChild(body.children[0]);
+  tli++;
+},1900);
+
+/* ── NAV / SECTION ── */
+function openDash(){
+  document.getElementById('hero').style.display='none';
+  document.getElementById('dashboard').style.display='block';
+  window.scrollTo(0,0);
+  document.getElementById('nav').classList.add('scrolled');
+}
+
+function goTo(id,tab){
+  if(document.getElementById('dashboard').style.display==='none')openDash();
+  document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(t=>t.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  if(tab)tab.classList.add('active');
+}
+
+/* ── LOGGING ── */
+function addLog(msg,type='info'){
+  const t=new Date().toTimeString().slice(0,8);
+  const line=document.createElement('div');
+  line.className='log-line';
+  line.innerHTML=`<span class="log-t">${t}</span><span class="log-m ${type}">${msg}</span>`;
+  logEl.appendChild(line);
+  logEl.scrollTop=logEl.scrollHeight;
+  if(logEl.children.length>80)logEl.removeChild(logEl.children[0]);
+}
+
+function toast(msg,danger=false){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className='show'+(danger?' danger':'');
+  setTimeout(()=>el.className='',3500);
+}
+
+function counter(el,to,ms=700){
+  const from=parseInt(el.textContent)||0,start=performance.now();
+  const tick=now=>{
+    const p=Math.min((now-start)/ms,1);
+    el.textContent=Math.round(from+(to-from)*p);
+    if(p<1)requestAnimationFrame(tick);
+  };
   requestAnimationFrame(tick);
 }
 
-async function fetchContainers() {
-  try {
-    const res = await fetch(API+'/api/containers');
-    if (!res.ok) throw new Error();
-    const data = await res.json();
-    containers = data || [];
+/* ── DATA ── */
+async function fetchContainers(){
+  try{
+    const r=await fetch(API+'/api/containers');
+    if(!r.ok)throw new Error();
+    ctrs=await r.json()||[];
     renderContainers();
-  } catch(e) {
-    addLog('Docker API unreachable — check port 2375', 'err');
-    document.getElementById('m-total').textContent = '—';
-    document.getElementById('m-unhealthy').textContent = '—';
+  }catch{addLog('Docker API unreachable — check port 2375','err')}
+}
+
+function renderContainers(){
+  const total=ctrs.length,bad=ctrs.filter(c=>c.unhealthy).length;
+  counter(document.getElementById('m-total'),total);
+  counter(document.getElementById('m-unhealthy'),bad);
+  document.getElementById('hs-ctr').textContent=total||'—';
+  document.getElementById('ctr-badge').textContent=total+' containers';
+
+  const mini=document.getElementById('ctr-mini');
+  mini.innerHTML=total===0
+    ?'<div class="empty-state"><div class="empty-icon">🐳</div>No containers found</div>'
+    :ctrs.slice(0,6).map(c=>`
+      <div class="ctr-row">
+        <div class="sdot ${c.unhealthy?'bad':'ok'}"></div>
+        <div class="ctr-name">${c.name}</div>
+        <div class="ctr-img">${c.image.split(':')[0].split('/').pop()}</div>
+        <div class="stag ${c.unhealthy?'bad':'ok'}">${c.unhealthy?'UNHEALTHY':'OK'}</div>
+      </div>`).join('');
+
+  document.getElementById('fleet-sub').textContent=`${total} containers · ${bad} unhealthy`;
+  const full=document.getElementById('ctrs-full');
+  full.innerHTML=total===0
+    ?'<div class="empty-state"><div class="empty-icon">🐳</div>No containers</div>'
+    :ctrs.map((c,i)=>`
+      <div class="cfc ${c.unhealthy?'bad':''}" style="animation-delay:${i*.04}s">
+        <div class="sdot ${c.unhealthy?'bad':'ok'}"></div>
+        <div class="cfc-info"><div class="cfc-name">${c.name}</div><div class="cfc-img">${c.image}</div></div>
+        ${c.cpu?`<div class="cfc-cpu">${c.cpu}% CPU</div>`:''}
+        <div class="stag ${c.unhealthy?'bad':'ok'}">${c.status}</div>
+      </div>`).join('');
+
+  if(bad>0)addLog(`⚠ ${bad} unhealthy container(s)`,'warn');
+  else if(total>0)addLog(`✓ All ${total} containers healthy`,'ok');
+}
+
+async function fetchIncidents(){
+  try{
+    const r=await fetch(API+'/api/incidents');
+    const data=await r.json();
+    if(!data||!data.length)return;
+    if(data.length>incCount){toast(`🚨 ${data[0].container}`,true);addLog(`Incident: ${data[0].container}`,'err')}
+    incCount=data.length;incs=data;
+    counter(document.getElementById('m-incidents'),data.length);
+    document.getElementById('hs-inc').textContent=data.length;
+    const html=incs.map(i=>`
+      <div class="inc-item">
+        <div class="inc-top"><div class="inc-name">🚨 ${i.container}</div><div class="inc-time">${i.time}</div></div>
+        <div class="inc-body">${i.summary||i.status}</div>
+      </div>`).join('');
+    document.getElementById('inc-mini').innerHTML=html;
+    document.getElementById('inc-full').innerHTML=html;
+  }catch{}
+}
+
+/* ── NL QUERY ── */
+function fillQ(el){document.getElementById('nl-input').value=el.textContent.trim();document.getElementById('nl-input').focus()}
+
+function filterRows(rows){
+  return(rows||[]).filter(row=>Object.values(row).some(v=>{
+    const s=String(v||'').trim();
+    return s!==''&&!/^[+|\s\-─│=]+$/.test(s);
+  }));
+}
+
+function renderTable(rows){
+  if(rows.length===0){
+    document.getElementById('nl-thead').innerHTML='';
+    document.getElementById('nl-tbody').innerHTML='<tr><td colspan="99" style="color:var(--muted);text-align:center;padding:24px">✅ Query ran — 0 rows returned</td></tr>';
+    addLog('0 rows returned','ok');
+  }else{
+    const keys=Object.keys(rows[0]);
+    document.getElementById('nl-thead').innerHTML='<tr>'+keys.map(k=>`<th>${k}</th>`).join('')+'</tr>';
+    document.getElementById('nl-tbody').innerHTML=rows.map(row=>'<tr>'+keys.map(k=>`<td title="${String(row[k]||'')}">${String(row[k]||'—').slice(0,80)}</td>`).join('')+'</tr>').join('');
+    addLog(`Returned ${rows.length} row(s)`,'ok');
   }
 }
 
-function renderContainers() {
-  const total = containers.length;
-  const bad = containers.filter(c => c.unhealthy).length;
-  counter(document.getElementById('m-total'), total);
-  counter(document.getElementById('m-unhealthy'), bad);
-  document.getElementById('container-count-label').textContent = `${total} containers`;
-  document.getElementById('mc-unhealthy').classList.toggle('alert', bad > 0);
-
-  const list = document.getElementById('container-list');
-  list.innerHTML = total === 0
-    ? '<div class="empty-state"><div class="empty-state-icon">🐳</div>No containers found</div>'
-    : containers.slice(0,6).map(c => `
-      <div class="container-row">
-        <div class="status-dot ${c.unhealthy?'unhealthy':'healthy'}"></div>
-        <div class="container-name">${c.name}</div>
-        <div class="container-image">${c.image.split(':')[0].split('/').pop()}</div>
-        <div class="container-status ${c.unhealthy?'unhealthy':'healthy'}">${c.unhealthy?'UNHEALTHY':'OK'}</div>
-      </div>`).join('');
-
-  const full = document.getElementById('containers-full');
-  document.getElementById('containers-sub').textContent = `${total} containers · ${bad} unhealthy`;
-  full.innerHTML = total === 0
-    ? '<div class="empty-state"><div class="empty-state-icon">🐳</div>No containers</div>'
-    : containers.map((c,i) => `
-      <div class="container-full-card ${c.unhealthy?'unhealthy':''}" style="animation-delay:${i*0.04}s">
-        <div class="status-dot ${c.unhealthy?'unhealthy':'healthy'}"></div>
-        <div><div class="cfc-name">${c.name}</div><div class="cfc-image">${c.image}</div></div>
-        ${c.cpu ? `<div class="cfc-cpu">${c.cpu}% CPU</div>` : ''}
-        <div class="cfc-status-badge ${c.unhealthy?'unhealthy':'healthy'}">${c.status}</div>
-      </div>`).join('');
-
-  if (bad > 0) addLog(`⚠ ${bad} unhealthy container(s) detected`, 'warn');
-  else addLog(`✓ All ${total} containers OK`, 'ok');
-}
-
-async function fetchIncidents() {
-  try {
-    const res = await fetch(API+'/api/incidents');
-    const data = await res.json();
-    if (!data || !data.length) return;
-    if (data.length > incidentCount) {
-      showToast(`🚨 Incident: ${data[0].container}`, true);
-      addLog(`Incident: ${data[0].container} — ${data[0].status}`, 'err');
-    }
-    incidentCount = data.length;
-    incidents = data;
-    counter(document.getElementById('m-incidents'), data.length);
-    const html = incidents.map(i => `
-      <div class="incident-item">
-        <div class="incident-top">
-          <div class="incident-container">🚨 ${i.container}</div>
-          <div class="incident-time">${i.time}</div>
-        </div>
-        <div class="incident-summary">${i.summary || i.status}</div>
-      </div>`).join('');
-    document.getElementById('incident-list').innerHTML = html;
-    document.getElementById('incidents-full').innerHTML = html;
-  } catch(e) {}
-}
-
-function fillExample(el) {
-  document.getElementById('nl-input').value = el.textContent.trim();
-  document.getElementById('nl-input').focus();
-}
-
-async function runNLQuery() {
-  const q = document.getElementById('nl-input').value.trim();
-  if (!q) return;
-  const btn = document.getElementById('nl-btn');
-  btn.textContent='...'; btn.disabled=true; btn.classList.add('loading');
-  document.getElementById('nl-result').classList.remove('visible');
-  document.getElementById('nl-error').style.display='none';
-  addLog(`Query: "${q}"`, 'info');
-  try {
-    const res = await fetch(API+'/api/query', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({question: q})
-    });
-    const data = await res.json();
-    document.getElementById('nl-result').classList.add('visible');
-    if (data.sql) document.getElementById('nl-sql-code').textContent = data.sql;
-    if (data.error) {
-      document.getElementById('nl-error').textContent = '⚠ ' + data.error;
-      document.getElementById('nl-error').style.display = 'block';
-      addLog('Error: ' + data.error, 'err');
-    } else if (data.results && data.results.length > 0) {
-      const keys = Object.keys(data.results[0]);
-      document.getElementById('nl-thead').innerHTML = '<tr>'+keys.map(k=>`<th>${k}</th>`).join('')+'</tr>';
-      document.getElementById('nl-tbody').innerHTML = data.results.map(row =>
-        '<tr>'+keys.map(k=>`<td title="${String(row[k]??'')}">${String(row[k]??'—').slice(0,80)}</td>`).join('')+'</tr>'
-      ).join('');
-      addLog(`Returned ${data.results.length} rows`, 'ok');
-    } else {
-      document.getElementById('nl-tbody').innerHTML = '<tr><td colspan="99" style="color:var(--muted);text-align:center;padding:20px">No results</td></tr>';
-    }
-  } catch(e) {
-    document.getElementById('nl-result').classList.add('visible');
-    document.getElementById('nl-error').textContent = '⚠ Backend unreachable — is go run main.go running?';
-    document.getElementById('nl-error').style.display = 'block';
+async function runNL(){
+  const q=document.getElementById('nl-input').value.trim();if(!q)return;
+  const btn=document.getElementById('nl-btn');
+  btn.textContent='...';btn.disabled=true;
+  document.getElementById('nl-result').classList.remove('show');
+  document.getElementById('nl-err').style.display='none';
+  addLog(`Query: "${q}"`,'info');
+  try{
+    const r=await fetch(API+'/api/query',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q})});
+    const d=await r.json();
+    document.getElementById('nl-result').classList.add('show');
+    if(d.sql)document.getElementById('nl-sql-code').textContent=d.sql;
+    if(d.error){
+      document.getElementById('nl-err').textContent='⚠ '+d.error;
+      document.getElementById('nl-err').style.display='block';
+      addLog('Error: '+d.error,'err');
+    }else{renderTable(filterRows(d.results))}
+  }catch{
+    document.getElementById('nl-result').classList.add('show');
+    document.getElementById('nl-err').textContent='⚠ Backend unreachable — is go run main.go running?';
+    document.getElementById('nl-err').style.display='block';
   }
-  btn.textContent='RUN'; btn.disabled=false; btn.classList.remove('loading');
+  btn.textContent='RUN';btn.disabled=false;
 }
 
-document.getElementById('nl-input').addEventListener('keydown', e => { if(e.key==='Enter') runNLQuery(); });
+document.getElementById('nl-input').addEventListener('keydown',e=>{if(e.key==='Enter')runNL()});
 
-async function runSQLExample(btn) {
-  const code = btn.closest('.sql-example-card').querySelector('.sql-example-code').innerText.trim();
-  showSection('query', document.querySelectorAll('.nav-tab')[3]);
-  document.getElementById('nl-input').value = code.slice(0,60)+'…';
-  document.getElementById('nl-result').classList.remove('visible');
-  document.getElementById('nl-error').style.display='none';
-  addLog('Running SQL example...', 'info');
-  try {
-    const res = await fetch(API+'/api/query', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({question: 'Execute this SQL exactly as written, return only the results: ' + code})
-    });
-    const data = await res.json();
-    document.getElementById('nl-result').classList.add('visible');
-    if (data.sql) document.getElementById('nl-sql-code').textContent = data.sql;
-    if (data.error) {
-      document.getElementById('nl-error').textContent = '⚠ ' + data.error;
-      document.getElementById('nl-error').style.display='block';
-    } else if (data.results && data.results.length > 0) {
-      const keys = Object.keys(data.results[0]);
-      document.getElementById('nl-thead').innerHTML = '<tr>'+keys.map(k=>`<th>${k}</th>`).join('')+'</tr>';
-      document.getElementById('nl-tbody').innerHTML = data.results.map(row =>
-        '<tr>'+keys.map(k=>`<td>${String(row[k]??'—').slice(0,80)}</td>`).join('')+'</tr>'
-      ).join('');
-    } else {
-      document.getElementById('nl-tbody').innerHTML = '<tr><td colspan="99" style="color:var(--muted);text-align:center;padding:20px">No results</td></tr>';
-    }
-  } catch(e) {}
+async function runEx(btn){
+  const code=btn.closest('.sql-ex').querySelector('.sql-ex-body').innerText.trim();
+  goTo('query',document.querySelectorAll('.nav-link')[3]);
+  document.getElementById('nl-input').value=code.slice(0,55)+'…';
+  document.getElementById('nl-result').classList.remove('show');
+  try{
+    const r=await fetch(API+'/api/query',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:'Execute this SQL exactly: '+code})});
+    const d=await r.json();
+    document.getElementById('nl-result').classList.add('show');
+    if(d.sql)document.getElementById('nl-sql-code').textContent=d.sql;
+    if(d.error){document.getElementById('nl-err').textContent='⚠ '+d.error;document.getElementById('nl-err').style.display='block'}
+    else renderTable(filterRows(d.results));
+  }catch{}
 }
 
-(function init() {
-  const saved = localStorage.getItem('theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', saved);
-  document.getElementById('themeBtn').textContent = saved==='dark' ? '🌙' : '☀️';
-  addLog('Coral Watchdog v1.0 · Docker + GitHub + Slack', 'info');
-  fetchContainers();
-  fetchIncidents();
-  setInterval(() => { fetchContainers(); fetchIncidents(); }, 30000);
-})();
+/* ── INIT ── */
+addLog('Coral Watchdog v1.0 · Docker + GitHub + Slack · gpt-4o-mini','info');
+fetchContainers();fetchIncidents();
+setInterval(()=>{fetchContainers();fetchIncidents()},30000);
 </script>
 </body>
 </html>
