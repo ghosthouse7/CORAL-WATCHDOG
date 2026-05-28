@@ -109,7 +109,7 @@ graph TD;
     E -->|60s Polling| F[Watcher];
     E -->|Real-time UI| G[Web Dashboard];
     
-    F -->|Context| H((DeepSeek AI / GitHub Models));
+    F -->|Context| H((gpt-4o-mini/Github Models));
     H -->|Root Cause Analysis| I[Slack #incidents Alert];
 
 ```
