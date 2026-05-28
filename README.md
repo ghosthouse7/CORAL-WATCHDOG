@@ -52,7 +52,7 @@ Docker + GitHub + Slack. One query. No ETL.
                Dashboard           Watcher
             (localhost:8080)    (60s polling)
                                      │
-                              DeepSeek AI (GitHub Models)
+                              gpt-4o-mini (GitHub Models)
                                      │
                               Slack #incidents alert
 ```
