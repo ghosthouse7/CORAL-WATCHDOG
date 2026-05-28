@@ -335,15 +335,16 @@ It is an AI-powered operational command center.
 <div align="center">
 
 ## 🌌 Live Dashboard Preview
+<img width="1920" height="906" alt="coralwatchdogfinal" src="https://github.com/user-attachments/assets/93670ca2-77f7-4be2-a5dd-764949d91c35" />
 
-<img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYjM4ODk4M2JjODk0MTY0NWE4NjI1MTA2OWQwM2JmOWZmODI5MzJmNyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/l0HlNaQ6gWfllcjDO/giphy.gif" width="90%"/>
 
 <br/>
 <br/>
 
 ## ⚡ AI Incident Feed
 
-<img src="https://media.giphy.com/media/coxQHKASG60HrHtvkt/giphy.gif" width="90%"/>
+<img width="1920" height="896" alt="coralgpt" src="https://github.com/user-attachments/assets/1b09ad28-e4b1-49b6-8c84-92295fa64cfd" />
+
 
 </div>
 
