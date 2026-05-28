@@ -2,76 +2,190 @@ package agent
 
 import (
 	"bytes"
-	"encoding/csv"
 	"fmt"
+	"log"
 	"os/exec"
 	"strings"
 )
 
-// CoralRow represents a single result row from a Coral SQL query.
-// Keys are column names, values are string representations.
-type CoralRow map[string]string
-
-// RunQuery executes a SQL query via the Coral CLI and returns rows.
-// Coral outputs CSV by default, which we parse here.
-func RunQuery(sql string) ([]CoralRow, error) {
-	// --no-color avoids ANSI codes breaking CSV parse
+// RunQueryRaw runs SQL via Coral, returns raw string output (for AI context).
+func RunQueryRaw(sql string) (string, error) {
 	cmd := exec.Command(".\\coral.exe", "sql", sql)
+	var out, errBuf bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &errBuf
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("%s", strings.TrimSpace(errBuf.String()))
+	}
+	return strings.TrimSpace(out.String()), nil
+}
 
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
+// RunQueryRows runs SQL via Coral, returns parsed rows for the dashboard API.
+func RunQueryRows(sql string) ([]map[string]string, error) {
+	cmd := exec.Command(".\\coral.exe", "sql", sql)
+	var out, errBuf bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &errBuf
 
 	if err := cmd.Run(); err != nil {
-		return nil, fmt.Errorf("coral sql failed: %w\nstderr: %s", err, stderr.String())
+		stderr := strings.TrimSpace(errBuf.String())
+		log.Printf("Coral stderr: %s", stderr)
+		return nil, fmt.Errorf("%s", stderr)
 	}
 
-	output := strings.TrimSpace(stdout.String())
-	if output == "" {
-		return []CoralRow{}, nil
+	raw := out.String()
+	for i, line := range strings.Split(raw, "\n") {
+		log.Printf("coral[%02d]: %q", i, line)
 	}
 
-	reader := csv.NewReader(strings.NewReader(output))
-	reader.LazyQuotes = true
+	return parseCoralTable(raw)
+}
 
-	records, err := reader.ReadAll()
+// RunQueryString wraps RunQueryRows returning []map[string]interface{}.
+func RunQueryString(sql string) ([]map[string]interface{}, error) {
+	rows, err := RunQueryRows(sql)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse coral output as CSV: %w\nraw output: %s", err, output)
+		return nil, err
 	}
-
-	if len(records) < 2 {
-		// Only header row or empty — no data
-		return []CoralRow{}, nil
+	out := make([]map[string]interface{}, len(rows))
+	for i, r := range rows {
+		m := make(map[string]interface{}, len(r))
+		for k, v := range r {
+			m[k] = v
+		}
+		out[i] = m
 	}
+	return out, nil
+}
 
-	headers := records[0]
-	rows := make([]CoralRow, 0, len(records)-1)
+func parseCoralTable(raw string) ([]map[string]string, error) {
+	lines := strings.Split(raw, "\n")
 
-	for _, record := range records[1:] {
-		row := make(CoralRow, len(headers))
-		for i, h := range headers {
-			if i < len(record) {
-				row[h] = record[i]
+	// Detect if this is an empty result — Coral prints "++" or "| | |" with no data
+	// Count non-border, non-empty lines that have actual cell content
+	var headers []string
+	var rows []map[string]string
+	borderCount := 0
+
+	for _, line := range lines {
+		line = strings.TrimRight(line, "\r \t")
+		if line == "" {
+			continue
+		}
+
+		if isBorderLine(line) {
+			borderCount++
+			if headers != nil {
+				// After the header separator, data rows follow
+			}
+			continue
+		}
+
+		// Must have a cell separator
+		if !strings.Contains(line, "|") && !strings.Contains(line, "│") {
+			continue
+		}
+
+		cells := splitCells(line)
+		if len(cells) == 0 {
+			continue
+		}
+
+		// Check if all cells are empty (blank row like "|    |    |")
+		allEmpty := true
+		for _, c := range cells {
+			if strings.TrimSpace(c) != "" {
+				allEmpty = false
+				break
 			}
 		}
-		rows = append(rows, row)
+		if allEmpty {
+			continue // skip blank data rows
+		}
+
+		if headers == nil {
+			// First non-border row with content = headers
+			headers = cells
+		} else if borderCount >= 2 {
+			// We've seen at least: top border, header, separator border
+			// So this is a data row
+			row := make(map[string]string, len(headers))
+			for i, h := range headers {
+				h = strings.TrimSpace(h)
+				if h == "" {
+					continue
+				}
+				val := ""
+				if i < len(cells) {
+					val = strings.TrimSpace(cells[i])
+				}
+				row[h] = val
+			}
+			hasVal := false
+			for _, v := range row {
+				if v != "" {
+					hasVal = true
+					break
+				}
+			}
+			if hasVal {
+				rows = append(rows, row)
+			}
+		}
 	}
 
+	if rows == nil {
+		return []map[string]string{}, nil
+	}
 	return rows, nil
 }
 
-// RunQueryString runs a Coral query and returns the raw output string.
-// Useful for embedding full context into the Claude summarization prompt.
-func RunQueryString(sql string) (string, error) {
-	cmd := exec.Command(".\\coral.exe", "sql", sql)
-
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	if err := cmd.Run(); err != nil {
-		return "", fmt.Errorf("coral sql failed: %w\nstderr: %s", err, stderr.String())
+func isBorderLine(line string) bool {
+	s := strings.TrimSpace(line)
+	if s == "" {
+		return false
 	}
+	// Must start and end with + or box char
+	if !strings.HasPrefix(s, "+") && !strings.HasPrefix(s, "┌") &&
+		!strings.HasPrefix(s, "├") && !strings.HasPrefix(s, "└") {
+		return false
+	}
+	// All chars must be border chars
+	for _, r := range s {
+		switch r {
+		case '┌', '┐', '└', '┘', '├', '┤', '┬', '┴', '┼', '─',
+			'+', '-', '=', ' ':
+			// ok
+		default:
+			return false
+		}
+	}
+	return true
+}
 
-	return strings.TrimSpace(stdout.String()), nil
+func splitCells(line string) []string {
+	sep := "|"
+	if strings.Contains(line, "│") {
+		sep = "│"
+	}
+	parts := strings.Split(line, sep)
+	var cells []string
+	for _, p := range parts {
+		cells = append(cells, strings.TrimSpace(p))
+	}
+	// Trim outer empty strings from border chars
+	for len(cells) > 0 && cells[0] == "" {
+		cells = cells[1:]
+	}
+	for len(cells) > 0 && cells[len(cells)-1] == "" {
+		cells = cells[:len(cells)-1]
+	}
+	return cells
+}
+
+func truncate(s string, n int) string {
+	if len(s) <= n {
+		return s
+	}
+	return s[:n] + "..."
 }

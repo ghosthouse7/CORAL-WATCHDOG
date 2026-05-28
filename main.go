@@ -10,7 +10,6 @@ import (
 
 func main() {
 	log.Println("🏴‍☠️  Coral Watchdog starting...")
-	log.Println("   Watching Docker + GitHub + Slack for incidents")
 
 	required := []string{
 		"GITHUB_TOKEN",
@@ -20,7 +19,6 @@ func main() {
 		"SLACK_BOT_TOKEN",
 		"SLACK_INCIDENT_CHANNEL",
 	}
-
 	for _, env := range required {
 		if os.Getenv(env) == "" {
 			log.Fatalf("❌ Missing required environment variable: %s", env)
@@ -28,6 +26,9 @@ func main() {
 	}
 
 	w := agent.NewWatcher()
+
+	// Start the dashboard web server in background
+	go agent.StartDashboard(agent.NewDockerClient())
 
 	log.Println("▶️  Running initial incident check...")
 	if err := w.Check(); err != nil {
@@ -37,7 +38,7 @@ func main() {
 	ticker := time.NewTicker(60 * time.Second)
 	defer ticker.Stop()
 
-	log.Println("👁️  Watching for incidents every 60s... (Ctrl+C to stop)")
+	log.Println("👁️  Watching every 60s · Dashboard at http://localhost:8080")
 	for range ticker.C {
 		if err := w.Check(); err != nil {
 			log.Printf("⚠️  Check error: %v", err)

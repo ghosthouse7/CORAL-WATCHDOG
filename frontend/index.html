@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Coral Watchdog 🏴‍☠️</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #09090b;
+  --bg2: #111113;
+  --bg3: #18181b;
+  --border: #27272a;
+  --border2: #3f3f46;
+  --text: #fafafa;
+  --muted: #71717a;
+  --accent: #22d3ee;
+  --accent2: #a78bfa;
+  --red: #f87171;
+  --green: #4ade80;
+  --yellow: #fbbf24;
+  --glow: 0 0 20px rgba(34,211,238,0.15);
+  --glow-red: 0 0 20px rgba(248,113,113,0.2);
+}
+[data-theme="light"] {
+  --bg: #fafafa;
+  --bg2: #f4f4f5;
+  --bg3: #e4e4e7;
+  --border: #d4d4d8;
+  --border2: #a1a1aa;
+  --text: #09090b;
+  --muted: #71717a;
+  --glow: 0 0 20px rgba(34,211,238,0.08);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.3s, color 0.3s;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(34,211,238,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,211,238,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+[data-theme="light"] body::before {
+  background-image:
+    linear-gradient(rgba(34,211,238,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,211,238,0.06) 1px, transparent 1px);
+}
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.015) 2px,rgba(0,0,0,0.015) 4px);
+  pointer-events: none;
+  z-index: 1;
+}
+nav {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; gap: 0;
+  padding: 0 24px;
+  height: 56px;
+  background: rgba(9,9,11,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+[data-theme="light"] nav { background: rgba(250,250,250,0.85); }
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+  text-shadow: 0 0 20px rgba(34,211,238,0.5);
+  margin-right: 32px;
+  white-space: nowrap;
+}
+.nav-logo span { color: var(--text); }
+.nav-tabs { display: flex; gap: 0; flex: 1; }
+.nav-tab {
+  padding: 0 16px;
+  height: 56px;
+  display: flex; align-items: center;
+  font-size: 0.8rem;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  user-select: none;
+}
+.nav-tab:hover { color: var(--text); }
+.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.nav-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.live-badge {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 10px;
+  background: rgba(74,222,128,0.1);
+  border: 1px solid rgba(74,222,128,0.3);
+  border-radius: 99px;
+  font-size: 0.7rem;
+  color: var(--green);
+  letter-spacing: 0.1em;
+}
+.live-dot {
+  width: 6px; height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+.theme-btn {
+  width: 36px; height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg2);
+  color: var(--muted);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  transition: border-color 0.2s, color 0.2s;
+}
+.theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+main { max-width: 1280px; margin: 0 auto; padding: 24px; position: relative; z-index: 2; }
+.section { display: none; }
+.section.active { display: block; }
+.page-header { margin-bottom: 24px; animation: fadeUp 0.5s ease both; }
+.page-title { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em; }
+.page-title span { color: var(--accent); }
+.page-sub { color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
+.metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
+@media(max-width:768px) { .metrics { grid-template-columns: repeat(2,1fr); } }
+.metric-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeUp 0.5s ease both;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.metric-card:hover { border-color: var(--border2); box-shadow: var(--glow); }
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  opacity: 0.6;
+}
+.metric-card.alert::before { background: linear-gradient(90deg, var(--red), transparent); }
+.metric-card.alert { border-color: rgba(248,113,113,0.3); }
+.metric-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px; }
+.metric-value { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--text); line-height: 1; }
+.metric-value.red { color: var(--red); }
+.metric-value.green { color: var(--green); }
+.metric-sub { font-size: 0.7rem; color: var(--muted); margin-top: 6px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+@media(max-width:900px) { .grid-2 { grid-template-columns: 1fr; } }
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; animation: fadeUp 0.5s ease both; transition: border-color 0.2s; }
+.card:hover { border-color: var(--border2); }
+.card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+.card-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.card-title-accent { color: var(--accent); }
+.card-body { padding: 0; }
+.container-row { display: flex; align-items: center; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--border); transition: background 0.15s; animation: slideIn 0.3s ease both; }
+.container-row:last-child { border-bottom: none; }
+.container-row:hover { background: var(--bg3); }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.status-dot.healthy { background: var(--green); box-shadow: 0 0 8px var(--green); }
+.status-dot.unhealthy { background: var(--red); box-shadow: 0 0 8px var(--red); animation: blink 1s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.container-name { font-weight: 600; font-size: 0.85rem; flex: 1; }
+.container-image { color: var(--muted); font-size: 0.75rem; }
+.container-status { font-size: 0.7rem; padding: 3px 8px; border-radius: 99px; border: 1px solid; }
+.container-status.healthy { color: var(--green); border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.08); }
+.container-status.unhealthy { color: var(--red); border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.08); }
+.log-stream { height: 240px; overflow-y: auto; padding: 12px; font-size: 0.72rem; line-height: 1.8; background: var(--bg); border-top: 1px solid var(--border); }
+.log-stream::-webkit-scrollbar { width: 4px; }
+.log-stream::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+.log-line { display: flex; gap: 10px; animation: fadeIn 0.2s ease; }
+.log-time { color: var(--muted); flex-shrink: 0; }
+.log-msg.ok { color: var(--green); }
+.log-msg.err { color: var(--red); }
+.log-msg.info { color: var(--accent); }
+.log-msg.warn { color: var(--yellow); }
+.incident-item { padding: 14px 18px; border-bottom: 1px solid var(--border); animation: slideIn 0.3s ease both; }
+.incident-item:last-child { border-bottom: none; }
+.incident-top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.incident-container { font-weight: 600; color: var(--red); font-size: 0.85rem; }
+.incident-time { color: var(--muted); font-size: 0.7rem; margin-left: auto; }
+.incident-summary { color: var(--muted); font-size: 0.78rem; line-height: 1.6; }
+.containers-grid { display: grid; gap: 10px; }
+.container-full-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; transition: border-color 0.2s, box-shadow 0.2s; animation: fadeUp 0.3s ease both; }
+.container-full-card:hover { border-color: var(--border2); box-shadow: var(--glow); }
+.container-full-card.unhealthy { border-color: rgba(248,113,113,0.3); box-shadow: var(--glow-red); }
+.cfc-name { font-weight: 600; font-size: 0.9rem; }
+.cfc-image { color: var(--muted); font-size: 0.75rem; margin-top: 2px; }
+.cfc-cpu { font-size: 0.8rem; color: var(--accent); margin-left: auto; }
+.cfc-status-badge { font-size: 0.72rem; padding: 4px 10px; border-radius: 99px; border: 1px solid; white-space: nowrap; }
+.cfc-status-badge.healthy { color: var(--green); border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.06); }
+.cfc-status-badge.unhealthy { color: var(--red); border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.06); }
+.empty-state { padding: 40px; text-align: center; color: var(--muted); font-size: 0.8rem; }
+.empty-state-icon { font-size: 2rem; margin-bottom: 10px; }
+/* NL QUERY */
+.nl-section { margin-bottom: 24px; }
+.nl-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; animation: fadeUp 0.5s ease both; position: relative; }
+.nl-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
+.nl-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.nl-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.ai-badge { font-size: 0.65rem; padding: 2px 8px; background: rgba(167,139,250,0.15); border: 1px solid rgba(167,139,250,0.3); border-radius: 99px; color: var(--accent2); letter-spacing: 0.08em; }
+.nl-input-row { display: flex; align-items: stretch; gap: 0; }
+.prompt-prefix { display: flex; align-items: center; padding: 0 14px; background: var(--bg); border-right: 1px solid var(--border); color: var(--accent); font-size: 0.85rem; flex-shrink: 0; }
+#nl-input { flex: 1; background: var(--bg2); border: none; outline: none; padding: 16px 18px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text); caret-color: var(--accent); }
+#nl-input::placeholder { color: var(--muted); }
+#nl-input:focus { background: var(--bg3); }
+.nl-btn { padding: 0 20px; background: var(--accent); border: none; color: #000; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.08em; transition: opacity 0.2s, background 0.2s; white-space: nowrap; }
+.nl-btn:hover { opacity: 0.85; }
+.nl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.nl-btn.loading { background: var(--accent2); }
+.nl-examples { padding: 10px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap; }
+.example-chip { font-size: 0.7rem; padding: 4px 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: 99px; color: var(--muted); cursor: pointer; transition: border-color 0.2s, color 0.2s; }
+.example-chip:hover { border-color: var(--accent); color: var(--accent); }
+.nl-result { border-top: 1px solid var(--border); display: none; }
+.nl-result.visible { display: block; }
+.generated-sql { padding: 12px 18px; background: var(--bg); border-bottom: 1px solid var(--border); font-size: 0.75rem; color: var(--muted); }
+.generated-sql-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 6px; }
+.generated-sql-code { color: var(--text); }
+.nl-table-wrap { overflow-x: auto; }
+.nl-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+.nl-table th { text-align: left; padding: 8px 14px; background: var(--bg3); color: var(--muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid var(--border); }
+.nl-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text); font-size: 0.78rem; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nl-table tr:last-child td { border-bottom: none; }
+.nl-table tr:hover td { background: var(--bg3); }
+.nl-error { padding: 14px 18px; color: var(--red); font-size: 0.8rem; background: rgba(248,113,113,0.05); border-top: 1px solid rgba(248,113,113,0.2); }
+.sql-examples { display: grid; gap: 10px; margin-bottom: 20px; }
+.sql-example-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; animation: fadeUp 0.3s ease both; }
+.sql-example-label { padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); display: flex; align-items: center; justify-content: space-between; }
+.sql-run-btn { font-size: 0.65rem; padding: 3px 8px; background: rgba(34,211,238,0.1); border: 1px solid rgba(34,211,238,0.3); border-radius: 4px; color: var(--accent); cursor: pointer; transition: background 0.2s; font-family: 'JetBrains Mono', monospace; }
+.sql-run-btn:hover { background: rgba(34,211,238,0.2); }
+.sql-example-code { padding: 14px 16px; font-size: 0.75rem; line-height: 1.7; background: var(--bg); }
+.sql-kw { color: var(--accent2); font-weight: 600; }
+.sql-tbl { color: var(--accent); }
+.sql-str { color: var(--yellow); }
+.sql-num { color: var(--green); }
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes slideIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
+.metrics .metric-card:nth-child(1){animation-delay:.05s}
+.metrics .metric-card:nth-child(2){animation-delay:.1s}
+.metrics .metric-card:nth-child(3){animation-delay:.15s}
+.metrics .metric-card:nth-child(4){animation-delay:.2s}
+#toast { position:fixed; bottom:24px; right:24px; background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:12px 18px; font-size:0.8rem; color:var(--text); z-index:1000; max-width:300px; opacity:0; transform:translateY(10px); transition:opacity 0.3s,transform 0.3s; pointer-events:none; }
+#toast.show { opacity:1; transform:translateY(0); }
+#toast.alert { border-color:rgba(248,113,113,0.4); background:rgba(248,113,113,0.1); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">🪸 Coral<span>Watchdog</span></div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showSection('overview',this)">Overview</div>
+    <div class="nav-tab" onclick="showSection('containers',this)">Containers</div>
+    <div class="nav-tab" onclick="showSection('incidents',this)">Incidents</div>
+    <div class="nav-tab" onclick="showSection('query',this)">Query</div>
+  </div>
+  <div class="nav-right">
+    <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+  </div>
+</nav>
+
+<main>
+
+<!-- OVERVIEW -->
+<div class="section active" id="section-overview">
+  <div class="page-header">
+    <div class="page-title">Infrastructure <span>Overview</span></div>
+    <div class="page-sub">Real-time monitoring via Docker + GitHub + Slack · Powered by Coral SQL</div>
+  </div>
+  <div class="metrics">
+    <div class="metric-card">
+      <div class="metric-label">Total Containers</div>
+      <div class="metric-value" id="m-total">—</div>
+      <div class="metric-sub">Across all states</div>
+    </div>
+    <div class="metric-card alert" id="mc-unhealthy">
+      <div class="metric-label">Unhealthy</div>
+      <div class="metric-value red" id="m-unhealthy">—</div>
+      <div class="metric-sub">Require attention</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Incidents (24h)</div>
+      <div class="metric-value" id="m-incidents">0</div>
+      <div class="metric-sub">AI-analyzed</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Coral Sources</div>
+      <div class="metric-value green">3</div>
+      <div class="metric-sub">Docker · GitHub · Slack</div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🐳 <span class="card-title-accent">docker</span>.containers</div>
+        <div style="font-size:0.7rem;color:var(--muted)" id="container-count-label">—</div>
+      </div>
+      <div class="card-body" id="container-list">
+        <div class="empty-state"><div class="empty-state-icon">⏳</div>Loading…</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📡 <span class="card-title-accent">Live</span> Log Stream</div>
+      </div>
+      <div class="log-stream" id="log-stream">
+        <div class="log-line"><span class="log-time">--:--:--</span><span class="log-msg info">Coral Watchdog initialising...</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">🚨 <span class="card-title-accent">Recent</span> Incidents</div>
+    </div>
+    <div class="card-body" id="incident-list">
+      <div class="empty-state"><div class="empty-state-icon">✅</div>No incidents — all clear</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTAINERS -->
+<div class="section" id="section-containers">
+  <div class="page-header">
+    <div class="page-title"><span>Container</span> Fleet</div>
+    <div class="page-sub" id="containers-sub">Loading Docker state…</div>
+  </div>
+  <div class="containers-grid" id="containers-full"></div>
+</div>
+
+<!-- INCIDENTS -->
+<div class="section" id="section-incidents">
+  <div class="page-header">
+    <div class="page-title"><span>Incident</span> Feed</div>
+    <div class="page-sub">AI root-cause summaries · Notified via Slack</div>
+  </div>
+  <div class="card">
+    <div class="card-body" id="incidents-full">
+      <div class="empty-state"><div class="empty-state-icon">✅</div>No incidents yet — looking good!</div>
+    </div>
+  </div>
+</div>
+
+<!-- QUERY -->
+<div class="section" id="section-query">
+  <div class="page-header">
+    <div class="page-title">Natural Language <span>Query</span></div>
+    <div class="page-sub">Ask anything about your infra → Coral SQL → Results</div>
+  </div>
+  <div class="nl-section">
+    <div class="nl-card">
+      <div class="nl-header">
+        <div class="nl-title">🪸 Coral Query Interface</div>
+        <div class="ai-badge">AI · gpt-4o-mini NL→SQL</div>
+      </div>
+      <div class="nl-input-row">
+        <div class="prompt-prefix">❯</div>
+        <input id="nl-input" type="text" placeholder="which containers are unhealthy right now?" autocomplete="off"/>
+        <button class="nl-btn" id="nl-btn" onclick="runNLQuery()">RUN</button>
+      </div>
+      <div class="nl-examples">
+        <span class="example-chip" onclick="fillExample(this)">show all containers</span>
+        <span class="example-chip" onclick="fillExample(this)">list recent pull requests</span>
+        <span class="example-chip" onclick="fillExample(this)">which containers are exited?</span>
+        <span class="example-chip" onclick="fillExample(this)">show open PRs from github</span>
+      </div>
+      <div class="nl-result" id="nl-result">
+        <div class="generated-sql" id="nl-sql-display">
+          <div class="generated-sql-label">Generated Coral SQL</div>
+          <div class="generated-sql-code" id="nl-sql-code"></div>
+        </div>
+        <div class="nl-table-wrap">
+          <table class="nl-table" id="nl-table">
+            <thead id="nl-thead"></thead>
+            <tbody id="nl-tbody"></tbody>
+          </table>
+        </div>
+        <div class="nl-error" id="nl-error" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-header" style="margin-top:8px">
+    <div class="page-title" style="font-size:1.1rem">Cross-Source <span>SQL Examples</span></div>
+  </div>
+  <div class="sql-examples">
+
+    <!-- FIXED: quoted docker column names -->
+    <div class="sql-example-card">
+      <div class="sql-example-label">Incident Analysis — Docker + GitHub JOIN<button class="sql-run-btn" onclick="runSQLExample(this)">▶ RUN</button></div>
+      <div class="sql-example-code">
+        <span class="sql-kw">SELECT</span> dc."Image", dc."Status", gp.title <span class="sql-kw">AS</span> last_pr, gp.user__login <span class="sql-kw">AS</span> author<br>
+        <span class="sql-kw">FROM</span> <span class="sql-tbl">docker.containers</span> dc<br>
+        <span class="sql-kw">LEFT JOIN</span> <span class="sql-tbl">github.pulls</span> gp<br>
+        &nbsp;&nbsp;<span class="sql-kw">ON</span> gp.owner = <span class="sql-str">'ghosthouse7'</span> <span class="sql-kw">AND</span> gp.repo = <span class="sql-str">'CORAL-WATCHDOG'</span><br>
+        <span class="sql-kw">WHERE</span> dc."State" != <span class="sql-str">'running'</span><br>
+        <span class="sql-kw">LIMIT</span> <span class="sql-num">10</span>
+      </div>
+    </div>
+
+    <!-- FIXED: quoted docker column names -->
+    <div class="sql-example-card">
+      <div class="sql-example-label">Container Fleet Status<button class="sql-run-btn" onclick="runSQLExample(this)">▶ RUN</button></div>
+      <div class="sql-example-code">
+        <span class="sql-kw">SELECT</span> "Id", "Image", "Status", "State", "Created"<br>
+        <span class="sql-kw">FROM</span> <span class="sql-tbl">docker.containers</span><br>
+        <span class="sql-kw">ORDER BY</span> "Created" <span class="sql-kw">DESC</span><br>
+        <span class="sql-kw">LIMIT</span> <span class="sql-num">20</span>
+      </div>
+    </div>
+
+    <!-- GitHub only — no docker columns, no change needed -->
+    <div class="sql-example-card">
+      <div class="sql-example-label">Recent GitHub Pull Requests<button class="sql-run-btn" onclick="runSQLExample(this)">▶ RUN</button></div>
+      <div class="sql-example-code">
+        <span class="sql-kw">SELECT</span> title, state, user__login, merged_at<br>
+        <span class="sql-kw">FROM</span> <span class="sql-tbl">github.pulls</span><br>
+        <span class="sql-kw">WHERE</span> owner = <span class="sql-str">'ghosthouse7'</span> <span class="sql-kw">AND</span> repo = <span class="sql-str">'CORAL-WATCHDOG'</span><br>
+        <span class="sql-kw">LIMIT</span> <span class="sql-num">10</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</main>
+<div id="toast"></div>
+
+<script>
+const API = '';
+let containers = [], incidents = [], incidentCount = 0;
+const logStream = document.getElementById('log-stream');
+
+function showSection(id, tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('section-' + id).classList.add('active');
+  if (tab) tab.classList.add('active');
+}
+
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
+  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+}
+
+function showToast(msg, isAlert=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (isAlert ? ' alert' : '');
+  setTimeout(() => t.className = '', 3500);
+}
+
+function addLog(msg, type='info') {
+  const now = new Date().toTimeString().slice(0,8);
+  const line = document.createElement('div');
+  line.className = 'log-line';
+  line.innerHTML = `<span class="log-time">${now}</span><span class="log-msg ${type}">${msg}</span>`;
+  logStream.appendChild(line);
+  logStream.scrollTop = logStream.scrollHeight;
+  if (logStream.children.length > 80) logStream.removeChild(logStream.children[0]);
+}
+
+function counter(el, target, duration=800) {
+  const start = performance.now(), from = parseInt(el.textContent)||0;
+  function tick(now) {
+    const p = Math.min((now-start)/duration, 1);
+    el.textContent = Math.round(from + (target-from)*p);
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+async function fetchContainers() {
+  try {
+    const res = await fetch(API+'/api/containers');
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    containers = data || [];
+    renderContainers();
+  } catch(e) {
+    addLog('Docker API unreachable — check port 2375', 'err');
+    document.getElementById('m-total').textContent = '—';
+    document.getElementById('m-unhealthy').textContent = '—';
+  }
+}
+
+function renderContainers() {
+  const total = containers.length;
+  const bad = containers.filter(c => c.unhealthy).length;
+  counter(document.getElementById('m-total'), total);
+  counter(document.getElementById('m-unhealthy'), bad);
+  document.getElementById('container-count-label').textContent = `${total} containers`;
+  document.getElementById('mc-unhealthy').classList.toggle('alert', bad > 0);
+
+  const list = document.getElementById('container-list');
+  list.innerHTML = total === 0
+    ? '<div class="empty-state"><div class="empty-state-icon">🐳</div>No containers found</div>'
+    : containers.slice(0,6).map(c => `
+      <div class="container-row">
+        <div class="status-dot ${c.unhealthy?'unhealthy':'healthy'}"></div>
+        <div class="container-name">${c.name}</div>
+        <div class="container-image">${c.image.split(':')[0].split('/').pop()}</div>
+        <div class="container-status ${c.unhealthy?'unhealthy':'healthy'}">${c.unhealthy?'UNHEALTHY':'OK'}</div>
+      </div>`).join('');
+
+  const full = document.getElementById('containers-full');
+  document.getElementById('containers-sub').textContent = `${total} containers · ${bad} unhealthy`;
+  full.innerHTML = total === 0
+    ? '<div class="empty-state"><div class="empty-state-icon">🐳</div>No containers</div>'
+    : containers.map((c,i) => `
+      <div class="container-full-card ${c.unhealthy?'unhealthy':''}" style="animation-delay:${i*0.04}s">
+        <div class="status-dot ${c.unhealthy?'unhealthy':'healthy'}"></div>
+        <div><div class="cfc-name">${c.name}</div><div class="cfc-image">${c.image}</div></div>
+        ${c.cpu ? `<div class="cfc-cpu">${c.cpu}% CPU</div>` : ''}
+        <div class="cfc-status-badge ${c.unhealthy?'unhealthy':'healthy'}">${c.status}</div>
+      </div>`).join('');
+
+  if (bad > 0) addLog(`⚠ ${bad} unhealthy container(s) detected`, 'warn');
+  else addLog(`✓ All ${total} containers OK`, 'ok');
+}
+
+async function fetchIncidents() {
+  try {
+    const res = await fetch(API+'/api/incidents');
+    const data = await res.json();
+    if (!data || !data.length) return;
+    if (data.length > incidentCount) {
+      showToast(`🚨 Incident: ${data[0].container}`, true);
+      addLog(`Incident: ${data[0].container} — ${data[0].status}`, 'err');
+    }
+    incidentCount = data.length;
+    incidents = data;
+    counter(document.getElementById('m-incidents'), data.length);
+    const html = incidents.map(i => `
+      <div class="incident-item">
+        <div class="incident-top">
+          <div class="incident-container">🚨 ${i.container}</div>
+          <div class="incident-time">${i.time}</div>
+        </div>
+        <div class="incident-summary">${i.summary || i.status}</div>
+      </div>`).join('');
+    document.getElementById('incident-list').innerHTML = html;
+    document.getElementById('incidents-full').innerHTML = html;
+  } catch(e) {}
+}
+
+function fillExample(el) {
+  document.getElementById('nl-input').value = el.textContent.trim();
+  document.getElementById('nl-input').focus();
+}
+
+async function runNLQuery() {
+  const q = document.getElementById('nl-input').value.trim();
+  if (!q) return;
+  const btn = document.getElementById('nl-btn');
+  btn.textContent='...'; btn.disabled=true; btn.classList.add('loading');
+  document.getElementById('nl-result').classList.remove('visible');
+  document.getElementById('nl-error').style.display='none';
+  addLog(`Query: "${q}"`, 'info');
+  try {
+    const res = await fetch(API+'/api/query', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({question: q})
+    });
+    const data = await res.json();
+    document.getElementById('nl-result').classList.add('visible');
+    if (data.sql) document.getElementById('nl-sql-code').textContent = data.sql;
+    if (data.error) {
+      document.getElementById('nl-error').textContent = '⚠ ' + data.error;
+      document.getElementById('nl-error').style.display = 'block';
+      addLog('Error: ' + data.error, 'err');
+    } else if (data.results && data.results.length > 0) {
+      const keys = Object.keys(data.results[0]);
+      document.getElementById('nl-thead').innerHTML = '<tr>'+keys.map(k=>`<th>${k}</th>`).join('')+'</tr>';
+      document.getElementById('nl-tbody').innerHTML = data.results.map(row =>
+        '<tr>'+keys.map(k=>`<td title="${String(row[k]??'')}">${String(row[k]??'—').slice(0,80)}</td>`).join('')+'</tr>'
+      ).join('');
+      addLog(`Returned ${data.results.length} rows`, 'ok');
+    } else {
+      document.getElementById('nl-tbody').innerHTML = '<tr><td colspan="99" style="color:var(--muted);text-align:center;padding:20px">No results</td></tr>';
+    }
+  } catch(e) {
+    document.getElementById('nl-result').classList.add('visible');
+    document.getElementById('nl-error').textContent = '⚠ Backend unreachable — is go run main.go running?';
+    document.getElementById('nl-error').style.display = 'block';
+  }
+  btn.textContent='RUN'; btn.disabled=false; btn.classList.remove('loading');
+}
+
+document.getElementById('nl-input').addEventListener('keydown', e => { if(e.key==='Enter') runNLQuery(); });
+
+async function runSQLExample(btn) {
+  const code = btn.closest('.sql-example-card').querySelector('.sql-example-code').innerText.trim();
+  showSection('query', document.querySelectorAll('.nav-tab')[3]);
+  document.getElementById('nl-input').value = code.slice(0,60)+'…';
+  document.getElementById('nl-result').classList.remove('visible');
+  document.getElementById('nl-error').style.display='none';
+  addLog('Running SQL example...', 'info');
+  try {
+    const res = await fetch(API+'/api/query', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({question: 'Execute this SQL exactly as written, return only the results: ' + code})
+    });
+    const data = await res.json();
+    document.getElementById('nl-result').classList.add('visible');
+    if (data.sql) document.getElementById('nl-sql-code').textContent = data.sql;
+    if (data.error) {
+      document.getElementById('nl-error').textContent = '⚠ ' + data.error;
+      document.getElementById('nl-error').style.display='block';
+    } else if (data.results && data.results.length > 0) {
+      const keys = Object.keys(data.results[0]);
+      document.getElementById('nl-thead').innerHTML = '<tr>'+keys.map(k=>`<th>${k}</th>`).join('')+'</tr>';
+      document.getElementById('nl-tbody').innerHTML = data.results.map(row =>
+        '<tr>'+keys.map(k=>`<td>${String(row[k]??'—').slice(0,80)}</td>`).join('')+'</tr>'
+      ).join('');
+    } else {
+      document.getElementById('nl-tbody').innerHTML = '<tr><td colspan="99" style="color:var(--muted);text-align:center;padding:20px">No results</td></tr>';
+    }
+  } catch(e) {}
+}
+
+(function init() {
+  const saved = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  document.getElementById('themeBtn').textContent = saved==='dark' ? '🌙' : '☀️';
+  addLog('Coral Watchdog v1.0 · Docker + GitHub + Slack', 'info');
+  fetchContainers();
+  fetchIncidents();
+  setInterval(() => { fetchContainers(); fetchIncidents(); }, 30000);
+})();
+</script>
+</body>
+</html>
