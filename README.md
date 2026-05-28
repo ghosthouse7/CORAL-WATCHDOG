@@ -1,3 +1,24 @@
+<div align="center">
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f172a,50:111827,100:1e293b&height=220&section=header&text=CORAL%20WATCHDOG&fontSize=52&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Autonomous%20AI%20Incident%20Intelligence&descAlignY=58" width="100%"/>
+
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=24&pause=1000&color=38BDF8&center=true&vCenter=true&width=900&lines=Detect+Infrastructure+Failures+in+Real-Time;Correlate+Docker+%2B+GitHub+%2B+Slack+with+Coral+SQL;AI-Powered+Root+Cause+Analysis;Live+Animated+DevOps+Command+Center;Built+for+the+Pirates+of+the+Coral-bean+Hackathon+2026" />
+
+<br/>
+<br/>
+
+<img src="https://img.shields.io/github/stars/ghosthouse7/CORAL-WATCHDOG?style=for-the-badge&color=38bdf8"/>
+<img src="https://img.shields.io/github/forks/ghosthouse7/CORAL-WATCHDOG?style=for-the-badge&color=818cf8"/>
+<img src="https://img.shields.io/github/license/ghosthouse7/CORAL-WATCHDOG?style=for-the-badge&color=22c55e"/>
+<img src="https://img.shields.io/github/last-commit/ghosthouse7/CORAL-WATCHDOG?style=for-the-badge&color=f43f5e"/>
+
+<br/>
+<br/>
+
+<img src="https://skillicons.dev/icons?i=go,docker,github,git,linux,vscode" />
+
+</div>
+
 # 🏴‍☠️ CORAL WATCHDOG
 
 ### Autonomous AI Incident Intelligence for Modern Infrastructure
@@ -52,6 +73,12 @@ Just live operational intelligence.
 ---
 
 # 🌌 The Dashboard Experience
+
+<div align="center">
+
+<img src="https://user-images.githubusercontent.com/74038190/212749726-d36b8253-74bb-450d-87d0-5bdf2d8d6f66.gif" width="100%"/>
+
+</div>
 
 ## ⚡ Fully Animated Real-Time Command Center
 
@@ -225,6 +252,33 @@ Automatically translated into Coral SQL and executed live.
 
 ---
 
+---
+
+# 🎥 README Motion Features
+
+This README is designed to feel alive using:
+
+* animated typing banners
+* live gradient headers
+* motion GIF sections
+* floating badges
+* capsule-render animations
+* dynamic GitHub stats
+* cyberpunk dashboard aesthetics
+* terminal-style UI blocks
+
+### Suggested Additions
+
+```md
+- Add real dashboard GIF demos
+- Add live incident replay clips
+- Add animated architecture walkthroughs
+- Add hover-preview screenshots
+- Add deployment timeline GIFs
+```
+
+---
+
 # 🛠️ Tech Stack
 
 | Technology        | Purpose                   |
@@ -274,6 +328,27 @@ It is an AI-powered operational command center.
 
 ---
 
+---
+
+# 📸 Demo Preview Section
+
+<div align="center">
+
+## 🌌 Live Dashboard Preview
+
+<img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYjM4ODk4M2JjODk0MTY0NWE4NjI1MTA2OWQwM2JmOWZmODI5MzJmNyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/l0HlNaQ6gWfllcjDO/giphy.gif" width="90%"/>
+
+<br/>
+<br/>
+
+## ⚡ AI Incident Feed
+
+<img src="https://media.giphy.com/media/coxQHKASG60HrHtvkt/giphy.gif" width="90%"/>
+
+</div>
+
+---
+
 # 📜 License
 
 MIT License.
@@ -287,5 +362,7 @@ MIT License.
 ### Made with Coral SQL, AI, and controlled chaos.
 
 # @ghosthouse7
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:111827,100:0f172a&height=120&section=footer" width="100%"/>
 
 </div>
