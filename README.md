@@ -1,248 +1,291 @@
+# 🏴‍☠️ CORAL WATCHDOG
+
+### Autonomous AI Incident Intelligence for Modern Infrastructure
+
 <div align="center">
 
-# 🏴‍☠️ CORAL WATCHDOG
+![banner](https://img.shields.io/badge/Built_For-Pirates_of_the_Coral--bean_Hackathon-black?style=for-the-badge)
 
-**The Ultimate Cross-Source DevOps Incident Agent.**
+[![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?style=for-the-badge\&logo=go\&logoColor=white)](https://go.dev/)
+[![Docker](https://img.shields.io/badge/Docker-Engine_API-2496ED?style=for-the-badge\&logo=docker\&logoColor=white)](https://docker.com/)
+[![Coral](https://img.shields.io/badge/Powered_By-Coral_SQL-ff6b6b?style=for-the-badge)](https://github.com/withcoral/coral)
+[![AI](https://img.shields.io/badge/AI-GPT--4o--mini-4D4D4E?style=for-the-badge)]()
+[![License](https://img.shields.io/badge/License-MIT-success?style=for-the-badge)](#license)
 
-[![Stack - Go](https://img.shields.io/badge/Stack-Go_1.22+-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://go.dev/)
-[![Stack - Docker](https://img.shields.io/badge/Stack-Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
-[![Powered by - Coral](https://img.shields.io/badge/Powered_by-Coral_SQL-FF6B6B?style=for-the-badge)](https://github.com/withcoral/coral)
-[![AI - DeepSeek](https://img.shields.io/badge/AI-DeepSeek_|_GPT-4D4D4E?style=for-the-badge&logo=github&logoColor=white)]()
-[![License - MIT](https://img.shields.io/badge/License-MIT-success?style=for-the-badge)](#license)
+## 🚨 Detect. Correlate. Explain. Resolve.
 
-*Built for the [Pirates of the Coral-bean Hackathon](https://www.wemakedevs.org/hackathons/coral) (May 25–31, 2026).*
+### *A cinematic real-time DevOps command center powered by Coral SQL and AI.*
+
+Coral Watchdog is an autonomous incident response platform that continuously watches your infrastructure, correlates failures with engineering activity, and generates AI-powered root cause analysis in seconds.
+
+Unlike traditional monitoring systems, Coral Watchdog combines:
+
+* 🐳 Docker runtime intelligence
+* 🔗 GitHub engineering context
+* 💬 Slack operational awareness
+* 🧠 GPT-4o-mini incident reasoning
+* ⚡ Coral SQL cross-source joins
+
+—all inside one live animated dashboard.
 
 ---
-</div>
 
-## ⚡ What It Does
+# ✨ What Makes It Different?
 
-When a Docker container goes unhealthy or exits unexpectedly, Coral Watchdog springs into action:
+Most monitoring tools only tell you **something failed.**
 
-1. **Detects** the incident by polling the Docker Engine API every 60 seconds.
-2. **Queries** Docker containers + GitHub pull requests in a single cross-source Coral SQL JOIN.
-3. **Analyzes** the incident using DeepSeek AI (via GitHub Models — 100% free).
-4. **Alerts** your team in Slack with a full, actionable root cause summary.
-5. **Displays** everything in a live, animated dark-mode dashboard at `http://localhost:8080`.
+Coral Watchdog tells you:
 
-> **The Magic:** Docker + GitHub + Slack. One single SQL query. Zero ETL pipelines required.
+* **what failed**
+* **why it probably failed**
+* **which PR likely caused it**
+* **who deployed it**
+* **which services are impacted**
+* **how to fix it faster**
 
-### 🌟 The Star Query
+No ETL pipelines.
+No custom ingestion layers.
+No observability warehouse.
+
+Just live operational intelligence.
+
+---
+
+# 🌌 The Dashboard Experience
+
+## ⚡ Fully Animated Real-Time Command Center
+
+Coral Watchdog includes a cinematic dashboard inspired by:
+
+* Linear
+* Vercel
+* Datadog
+* GitHub Pulse
+* sci-fi command center UIs
+
+### 🎥 Live Features
+
+* Smooth animated metric cards
+* Real-time incident stream
+* Pulsing service health indicators
+* Animated deployment timelines
+* Live container heartbeat effects
+* Auto-updating logs terminal
+* AI incident feed with typing animations
+* Dynamic charts + moving gradients
+* Floating particle background effects
+* Dark / light adaptive themes
+* Zero page reloads
+
+### 🧠 AI Incident Console
+
+Every incident appears with:
+
+* AI-generated root cause summary
+* suspected deployment correlation
+* impacted containers
+* probable remediation steps
+* incident severity scoring
+* precise timestamps
+
+---
+
+# 🌟 The Star Query
 
 ```sql
-SELECT dc.image, dc.status, dc.state,
-       gp.title  AS last_pr,
-       gp.user__login AS author,
-       sc.name   AS slack_channel
-FROM   docker.containers dc
+SELECT
+    dc.image,
+    dc.status,
+    dc.state,
+
+    gp.title AS last_pr,
+    gp.user__login AS author,
+
+    sc.name AS slack_channel
+
+FROM docker.containers dc
+
 LEFT JOIN github.pulls gp
-  ON  gp.owner = 'your-org' AND gp.repo = 'your-repo'
-LEFT JOIN slack.channels sc ON 1=1
-WHERE  dc.state != 'running'
-LIMIT  20;
+    ON gp.owner = 'your-org'
+   AND gp.repo  = 'your-repo'
 
+LEFT JOIN slack.channels sc
+    ON 1=1
 
-```python
-content = """<div align="center">
+WHERE dc.state != 'running'
 
-# 🏴‍☠️ CORAL WATCHDOG
-
-**The Ultimate Cross-Source DevOps Incident Agent.**
-
-[![Stack - Go](https://img.shields.io/badge/Stack-Go_1.22+-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://go.dev/)
-[![Stack - Docker](https://img.shields.io/badge/Stack-Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
-[![Powered by - Coral](https://img.shields.io/badge/Powered_by-Coral_SQL-FF6B6B?style=for-the-badge)](https://github.com/withcoral/coral)
-[![AI - DeepSeek](https://img.shields.io/badge/AI-DeepSeek_|_GPT-4D4D4E?style=for-the-badge&logo=github&logoColor=white)]()
-[![License - MIT](https://img.shields.io/badge/License-MIT-success?style=for-the-badge)](#license)
-
-*Built for the [Pirates of the Coral-bean Hackathon](https://www.wemakedevs.org/hackathons/coral) (May 25–31, 2026).*
-
----
-</div>
-
-## ⚡ What It Does
-
-When a Docker container goes unhealthy or exits unexpectedly, Coral Watchdog springs into action:
-
-1. **Detects** the incident by polling the Docker Engine API every 60 seconds.
-2. **Queries** Docker containers + GitHub pull requests in a single cross-source Coral SQL JOIN.
-3. **Analyzes** the incident using DeepSeek AI (via GitHub Models — 100% free).
-4. **Alerts** your team in Slack with a full, actionable root cause summary.
-5. **Displays** everything in a live, animated dark-mode dashboard at `http://localhost:8080`.
-
-> **The Magic:** Docker + GitHub + Slack. One single SQL query. Zero ETL pipelines required.
-
-### 🌟 The Star Query
-
-
+LIMIT 20;
 ```
 
-```text
-File generated.
+This single query joins:
 
-```sql
-SELECT dc.image, dc.status, dc.state,
-       gp.title  AS last_pr,
-       gp.user__login AS author,
-       sc.name   AS slack_channel
-FROM   docker.containers dc
-LEFT JOIN github.pulls gp
-  ON  gp.owner = 'your-org' AND gp.repo = 'your-repo'
-LEFT JOIN slack.channels sc ON 1=1
-WHERE  dc.state != 'running'
-LIMIT  20;
+* Docker runtime failures
+* GitHub pull request activity
+* Slack communication systems
 
-```
+—in real time.
 
 ---
 
-## 🏗️ Architecture
+# 🏗️ Architecture
 
 ```mermaid
-graph TD;
-    A[Docker Engine API] -->|Custom Source Spec| D(Coral SQL Layer);
-    B[GitHub API] -->|Built-in Source| D;
-    C[Slack API] -->|Built-in Source| D;
-    
-    D --> E{Go Agent};
-    
-    E -->|60s Polling| F[Watcher];
-    E -->|Real-time UI| G[Web Dashboard];
-    
-    F -->|Context| H((gpt-4o-mini/Github Models));
-    H -->|Root Cause Analysis| I[Slack #incidents Alert];
+graph TD
 
+A[Docker Engine API] --> D[Coral SQL Layer]
+B[GitHub API] --> D
+C[Slack API] --> D
+
+D --> E[Go Incident Agent]
+
+E --> F[Health Watcher]
+E --> G[Animated Dashboard]
+
+F --> H[GPT-4o-mini via GitHub Models]
+
+H --> I[AI Root Cause Analysis]
+
+I --> J[Slack Incident Alerts]
 ```
 
 ---
 
-## 🎯 Bounties Targeted
+# 🖥️ Dashboard UI Vision
 
-| Bounty | Description | Status |
-| --- | --- | --- |
-| 🥇 **Captain's Bounty** | Best Enterprise Agent | 🚢 Submitted |
-| 🐠 **Source Spec** | Custom Docker source spec | ✅ Built |
-| ⌨️ **Captain's Log** | Blog post walkthrough | ✅ Written |
-| 📦 **Social Swag** | LinkedIn/X post | ✅ Posted |
+## 🧊 Glassmorphism + Motion UI
 
----
+The frontend is designed as a premium motion dashboard using:
 
-## 🛠️ Tech Stack
+* animated glass cards
+* soft neon glow effects
+* blur-based panels
+* dynamic gradients
+* live charts
+* smooth transitions
+* responsive layouts
+* microinteractions
 
-* **Go 1.22+** — High-performance agent, HTTP server, and Docker API client.
-* **[Coral v0.3.0](https://github.com/withcoral/coral)** — The cross-source SQL engine powering the logic.
-* **Docker Engine API** — Custom Coral source spec (written entirely from scratch).
-* **GitHub & Slack APIs** — Leveraging Coral's built-in sources + webhooks.
-* **DeepSeek-V3** — AI root cause analysis accessed via GitHub Models.
-* **Vanilla Web** — HTML/CSS/JS dashboard featuring fluid animations and dark/light modes.
+### Suggested Frontend Upgrades
 
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-* Go 1.22+
-* Docker Desktop (with TCP port `2375` enabled)
-* Git
-
-### 1. Clone & Setup
-
-```bash
-git clone [https://github.com/ghosthouse7/CORAL-WATCHDOG.git](https://github.com/ghosthouse7/CORAL-WATCHDOG.git)
-cd CORAL-WATCHDOG
-
-```
-
-*Note: Download Coral v0.3.0 from the [official releases](https://github.com/withcoral/coral/releases) and place `coral.exe` (Windows) or `coral` (Linux/Mac) in the project root.*
-
-### 2. Configure Environment
-
-Create a `.env` file in the root directory:
-
-```env
-GITHUB_TOKEN=ghp_your_classic_token
-GITHUB_OWNER=your-github-username
-GITHUB_REPO=your-repo-name
-SLACK_WEBHOOK_URL=[https://hooks.slack.com/services/xxx/yyy/zzz](https://hooks.slack.com/services/xxx/yyy/zzz)
-SLACK_BOT_TOKEN=xoxb-your-bot-token
-SLACK_INCIDENT_CHANNEL=incidents
-
-```
-
-### 3. Enable Docker TCP API
-
-Navigate to **Docker Desktop → Settings → General** and enable:
-`Expose daemon on tcp://localhost:2375`
-
-### 4. Initialize Coral Sources (Windows Example)
-
-```powershell
-$env:GITHUB_TOKEN="ghp_..."
-.\coral source add github
-
-$env:SLACK_TOKEN="xoxb-..."
-.\coral source add slack
-
-.\coral source add --file .\sources\docker.yaml
-
-```
-
-### 5. Launch the Watchdog
-
-```powershell
-# Load env vars
-Get-Content .env | ForEach-Object {
-  if ($_ -match '^\s*([^#][^=]+)=(.*)$') {
-    [System.Environment]::SetEnvironmentVariable($matches[1].Trim(), $matches[2].Trim(), 'Process')
-  }
-}
-
-# Start the agent
-go run main.go
-
-```
-
-🌐 **Open [http://localhost:8080](https://www.google.com/search?q=http://localhost:8080) in your browser to view the live dashboard.**
+| Feature              | Tech                  |
+| -------------------- | --------------------- |
+| Animated charts      | Chart.js / ApexCharts |
+| Fluid transitions    | Framer Motion         |
+| Live sockets         | WebSockets            |
+| Background particles | tsParticles           |
+| Motion counters      | CountUp.js            |
+| Glassmorphism        | CSS backdrop filters  |
+| Terminal feed        | xterm.js              |
 
 ---
 
-## 📊 Dashboard Features
+# 📊 Dashboard Sections
 
-* **📈 Overview** — Live metrics, container health, incident feed, and log stream.
-* **🐳 Containers** — Full fleet view with CPU stats and visual status badges.
-* **🤖 Incidents** — AI-generated root cause summaries with precise timestamps.
-* **💬 Query Interface** — Natural language to Coral SQL translation with live results.
+## 🏠 Overview
+
+* infrastructure health score
+* active incidents
+* container uptime
+* deployment velocity
+* AI alert summaries
 
 ---
 
-## 📂 Project Structure
+## 🐳 Containers
 
-```text
-CORAL-WATCHDOG/
-├── main.go              # Agent entrypoint + env validation
-├── go.mod               # Go module dependencies
-├── frontend/
-│   └── index.html       # Dashboard (single file, no build step)
-├── agent/
-│   ├── coral.go         # Coral query runner
-│   ├── docker.go        # Docker Engine API client
-│   ├── server.go        # HTTP server + NL query endpoint
-│   ├── slack.go         # Slack webhook notifier
-│   ├── summarize.go     # DeepSeek AI integration
-│   └── watcher.go       # Container health watcher
-├── sources/
-│   └── docker.yaml      # Custom Coral source spec for Docker 
-├── queries/
-│   └── incident.sql     # The star cross-source SQL query
-└── .gitignore
+* live Docker container grid
+* CPU + memory monitoring
+* restart count tracking
+* animated health pulses
+* visual unhealthy indicators
 
+---
+
+## 🤖 AI Incidents
+
+* GPT-4o-mini generated incident summaries
+* severity tagging
+* probable causes
+* rollback recommendations
+* incident timelines
+
+---
+
+## 💬 Live Query Console
+
+Natural language → Coral SQL conversion.
+
+Example:
+
+```txt
+show unhealthy containers related to latest PRs
 ```
 
+Automatically translated into Coral SQL and executed live.
+
 ---
 
-### License
+# 🛠️ Tech Stack
 
-This project is licensed under the [MIT License](https://www.google.com/search?q=LICENSE).
+| Technology        | Purpose                   |
+| ----------------- | ------------------------- |
+| Go 1.22+          | Core backend engine       |
+| Coral SQL         | Cross-source querying     |
+| Docker Engine API | Infrastructure monitoring |
+| GitHub API        | PR correlation            |
+| Slack API         | Team alerts               |
+| GPT-4o-mini       | AI reasoning engine       |
+| HTML/CSS/JS       | Real-time frontend        |
+| WebSockets        | Live dashboard updates    |
 
-*Made with ☕ and Coral SQL by [@ghosthouse7](https://github.com/ghosthouse7) during the Pirates of the Coral-bean Hackathon 2026.*
+---
+
+# 🚀 Future Vision
+
+## Planned Features
+
+* Kubernetes support
+* OpenTelemetry traces
+* distributed incident graphing
+* auto-remediation workflows
+* multi-cluster monitoring
+* AI anomaly prediction
+* Grafana integration
+* GitHub Actions correlation
+* live deployment replay
+* AI copilots for debugging
+
+---
+
+# 🏆 Why This Project Matters
+
+Modern infrastructure produces massive operational noise.
+
+Coral Watchdog transforms that chaos into:
+
+* actionable intelligence
+* correlated incidents
+* AI-assisted debugging
+* real-time operational awareness
+
+It is not just another monitoring dashboard.
+
+It is an AI-powered operational command center.
+
+---
+
+# 📜 License
+
+MIT License.
+
+---
+
+<div align="center">
+
+## ⚓ Built during the Pirates of the Coral-bean Hackathon 2026
+
+### Made with Coral SQL, AI, and controlled chaos.
+
+# @ghosthouse7
+
+</div>
