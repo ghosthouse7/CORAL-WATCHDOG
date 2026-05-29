@@ -267,18 +267,6 @@ This README is designed to feel alive using:
 * cyberpunk dashboard aesthetics
 * terminal-style UI blocks
 
-### Suggested Additions
-
-```md
-- Add real dashboard GIF demos
-- Add live incident replay clips
-- Add animated architecture walkthroughs
-- Add hover-preview screenshots
-- Add deployment timeline GIFs
-```
-
----
-
 # 🛠️ Tech Stack
 
 | Technology        | Purpose                   |
